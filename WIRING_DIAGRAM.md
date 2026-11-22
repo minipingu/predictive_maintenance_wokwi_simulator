@@ -65,13 +65,12 @@ Sensor fisik asli Anda adalah **ADXL345**, sedangkan di Wokwi hanya tersedia **M
 | **Alamat I2C** | `0x68` | `0x53` (atau `0x1D`) |
 | **Driver Terintegrasi (`main.py`)** | Otomatis mendeteksi `0x68` dan membaca percepatan 3-sumbu dalam satuan $g$ | Otomatis mendeteksi `0x53` dan membaca percepatan 3-sumbu dalam satuan $g$ |
 
-> **Wiring Real ADXL345 ke Pico:**
-> - VCC -> Pin 36 (3V3)
-> - GND -> Pin 28 (GND)
-> - CS -> Pin 36 (3V3) *(mengaktifkan mode I2C)*
-> - SDO -> Pin 28 (GND) *(memilih alamat 0x53)*
-> - SDA -> Pin 26 (GP20)
-> - SCL -> Pin 27 (GP21)
+> **Wiring Real ADXL345 (Cukup 4 Kabel Utama):**
+> - VCC -> Pin 36 (3V3 Pico) / Pin 1 (3V3 RPi 4)
+> - GND -> Pin 28 (GND Pico) / Pin 9 (GND RPi 4)
+> - SDA -> Pin 26 (GP20 Pico) / Pin 3 (GPIO 2 RPi 4)
+> - SCL -> Pin 27 (GP21 Pico) / Pin 5 (GPIO 3 RPi 4)
+> - *CS & SDO: Pada breakout board GY-291 ADXL345, pin CS dan SDO sudah memiliki pull-up/pull-down resistor internal di PCB sehingga tidak perlu disambung kabel (NC).*
 
 ---
 

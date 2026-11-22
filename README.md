@@ -39,12 +39,11 @@ Proyek sistem pemantauan kesehatan bantalan bor (*drill bearing*) secara real-ti
 
 | Modul / Sensor | Pin Modul | Pin Fisik RPi 4 | Nama Pin BCM | Penjelasan Khusus RPi 4 |
 | :--- | :--- | :--- | :--- | :--- |
-| **ADXL345 (Getaran)** | **VCC** | **Pin 1** | `3V3 Power` | Catu daya logika 3.3V. |
+| **ADXL345 (Getaran)**<br>*(Cukup 4 Kabel)* | **VCC** | **Pin 1** | `3V3 Power` | Catu daya logika 3.3V. |
 | | **GND** | **Pin 9** | `Ground` | Jalur arde bersama. |
 | | **SDA** | **Pin 3** | `GPIO 2 (I2C1 SDA)` | Jalur data serial I2C bus 1. |
 | | **SCL** | **Pin 5** | `GPIO 3 (I2C1 SCL)` | Jalur clock serial I2C bus 1. |
-| | **CS** | **Pin 17** | `3V3 Power` | Hubungkan ke 3.3V untuk mengaktifkan mode I2C. |
-| | **SDO** | **Pin 25** | `Ground` | Hubungkan ke GND untuk memilih alamat I2C `0x53`. |
+| | **CS & SDO** | *NC / Dibiarkan Lepas* | *Tidak Perlu Kabel* | Pada modul GY-291, pin CS sudah memiliki pull-up internal (mode I2C aktif) dan SDO sudah memiliki pull-down internal (alamat I2C otomatis `0x53`). |
 | **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 1** (3.3V) / **Pin 2** (5V) | `3V3 / 5V Power` | Mendukung rentang 3.0V–5.5V. Coba hubungkan ke **3.3V (Pin 1)** terlebih dahulu; **jika sensor tidak terbaca (folder `28-*` tidak muncul), pindahkan VCC ke 5V (Pin 2 / Pin 4)** karena probe waterproof berkabel panjang sering membutuhkan 5V akibat drop tegangan. |
 | | **GND** (Hitam) | **Pin 6** | `Ground` | Arde bersama. |
 | | **DQ** (Kuning) | **Pin 7** | `GPIO 4 (GPCLK0)` | Jalur data kernel Linux 1-Wire (`w1-gpio`). |
