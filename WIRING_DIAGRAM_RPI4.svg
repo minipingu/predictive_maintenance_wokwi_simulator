@@ -1,35 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 880" width="100%" height="100%" style="background:#181a20; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 920" width="100%" height="100%" style="background:#14171f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
   <defs>
     <!-- Background Dot Grid -->
     <pattern id="rpiGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.2" fill="#292e3b"/>
+      <circle cx="2" cy="2" r="1.2" fill="#222736"/>
     </pattern>
 
-    <!-- Component Drop Shadow -->
-    <filter id="shadow" x="-10%" y="-10%" width="125%" height="125%">
+    <!-- Drop Shadows -->
+    <filter id="shadow" x="-8%" y="-8%" width="120%" height="120%">
       <feDropShadow dx="3" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
     </filter>
 
-    <filter id="wireShadow" x="-20%" y="-20%" width="140%" height="140%">
+    <filter id="wireShadow" x="-15%" y="-15%" width="130%" height="130%">
       <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.5"/>
     </filter>
 
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
     <!-- Metallic & Component Gradients -->
-    <linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e0e0e0"/>
-      <stop offset="50%" stop-color="#b0bec5"/>
-      <stop offset="100%" stop-color="#78909c"/>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cfd8dc"/>
+      <stop offset="50%" stop-color="#90a4ae"/>
+      <stop offset="100%" stop-color="#546e7a"/>
     </linearGradient>
 
     <linearGradient id="usb3Blue" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0277bd"/>
+      <stop offset="0%" stop-color="#0288d1"/>
       <stop offset="100%" stop-color="#01579b"/>
     </linearGradient>
 
-    <linearGradient id="resistorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#edd6b4"/>
-      <stop offset="50%" stop-color="#dfc194"/>
-      <stop offset="100%" stop-color="#ba9c6f"/>
+    <linearGradient id="resistorBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5e1c8"/>
+      <stop offset="50%" stop-color="#e0be92"/>
+      <stop offset="100%" stop-color="#c49a64"/>
     </linearGradient>
 
     <linearGradient id="lcdScreen" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -41,376 +46,481 @@
   <!-- Background Grid -->
   <rect width="100%" height="100%" fill="url(#rpiGrid)"/>
 
-  <!-- Top Header Title Banner -->
-  <rect x="25" y="15" width="1230" height="54" rx="8" fill="#1e222d" stroke="#333a4d" stroke-width="1.5" filter="url(#shadow)"/>
-  <circle cx="50" cy="42" r="7" fill="#e74c3c"/>
-  <circle cx="72" cy="42" r="7" fill="#f1c40f"/>
-  <circle cx="94" cy="42" r="7" fill="#2ecc71"/>
-  <text x="120" y="47" fill="#ffffff" font-size="16" font-weight="bold">SKEMA WIRING HARDWARE FISIK — RASPBERRY PI 4 MODEL B</text>
-  <rect x="1000" y="27" width="235" height="30" rx="6" fill="#c2185b"/>
-  <text x="1117" y="47" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">🍓 RPi 4 + I2C + 1-Wire + PWM</text>
+  <!-- ====================================================================== -->
+  <!-- TOP TITLE BANNER -->
+  <!-- ====================================================================== -->
+  <rect x="25" y="15" width="1230" height="52" rx="8" fill="#1e222d" stroke="#333a4d" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="50" cy="41" r="7" fill="#e74c3c"/>
+  <circle cx="72" cy="41" r="7" fill="#f1c40f"/>
+  <circle cx="94" cy="41" r="7" fill="#2ecc71"/>
+  <text x="120" y="46" fill="#ffffff" font-size="16" font-weight="bold">SKEMA WIRING HARDWARE FISIK — RASPBERRY PI 4 MODEL B</text>
+  <rect x="1000" y="26" width="235" height="30" rx="6" fill="#c2185b"/>
+  <text x="1117" y="46" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">🍓 RPi 4 + I2C + 1-Wire + PWM</text>
 
   <!-- ====================================================================== -->
-  <!-- 1. RASPBERRY PI 4 MODEL B BOARD (CENTER-LEFT) -->
+  <!-- 1. SENSOR 1: ADXL345 ACCELEROMETER MODULE (TOP LEFT) -->
   <!-- ====================================================================== -->
-  <g id="rpi4-board" transform="translate(480, 260)" filter="url(#shadow)">
+  <g id="mod-adxl345" transform="translate(35, 80)" filter="url(#shadow)">
+    <!-- Blue PCB -->
+    <rect x="0" y="0" width="180" height="155" rx="8" fill="#0d47a1" stroke="#1976d2" stroke-width="2"/>
+    <!-- Mounting Holes -->
+    <circle cx="16" cy="16" r="6.5" fill="#14171f" stroke="#ffd700" stroke-width="1.5"/>
+    <circle cx="164" cy="16" r="6.5" fill="#14171f" stroke="#ffd700" stroke-width="1.5"/>
+    
+    <!-- Title -->
+    <text x="90" y="24" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">ADXL345 (FISIK)</text>
+    <text x="90" y="38" fill="#90caf9" font-size="9" text-anchor="middle">3-Axis Digital Accelerometer</text>
+
+    <!-- ADXL345 QFN Chip (Black) -->
+    <rect x="65" y="46" width="50" height="42" rx="3" fill="#151515" stroke="#37474f" stroke-width="1.5"/>
+    <circle cx="74" cy="54" r="2" fill="#cfd8dc"/>
+    <text x="90" y="65" fill="#eceff1" font-size="8.5" font-weight="bold" text-anchor="middle">ADXL345</text>
+    <text x="90" y="77" fill="#4fc3f7" font-size="8" text-anchor="middle">I2C: 0x53</text>
+
+    <!-- 8 Header Pins at Bottom: VCC, GND, CS, INT1, INT2, SDO, SDA, SCL -->
+    <g transform="translate(10, 100)">
+      <g fill="#ffd700" stroke="#b8860b" stroke-width="1">
+        <rect x="0" y="0" width="16" height="42" rx="2"/>
+        <rect x="20" y="0" width="16" height="42" rx="2"/>
+        <rect x="40" y="0" width="16" height="42" rx="2"/>
+        <rect x="60" y="0" width="16" height="42" rx="2"/>
+        <rect x="80" y="0" width="16" height="42" rx="2"/>
+        <rect x="100" y="0" width="16" height="42" rx="2"/>
+        <rect x="120" y="0" width="16" height="42" rx="2"/>
+        <rect x="140" y="0" width="16" height="42" rx="2"/>
+      </g>
+      <!-- Holes -->
+      <g fill="#14171f">
+        <circle cx="8" cy="32" r="3.5"/><circle cx="28" cy="32" r="3.5"/><circle cx="48" cy="32" r="3.5"/>
+        <circle cx="68" cy="32" r="3.5"/><circle cx="88" cy="32" r="3.5"/><circle cx="108" cy="32" r="3.5"/>
+        <circle cx="128" cy="32" r="3.5"/><circle cx="148" cy="32" r="3.5"/>
+      </g>
+      <!-- Labels -->
+      <g font-size="8" fill="#ffffff" font-weight="bold" text-anchor="middle">
+        <text x="8" y="14" fill="#ff7043">VCC</text>
+        <text x="28" y="14" fill="#90a4ae">GND</text>
+        <text x="48" y="14" fill="#ff8a80">CS</text>
+        <text x="68" y="14" fill="#78909c">INT1</text>
+        <text x="88" y="14" fill="#78909c">INT2</text>
+        <text x="108" y="14" fill="#90a4ae">SDO</text>
+        <text x="128" y="14" fill="#2979ff">SDA</text>
+        <text x="148" y="14" fill="#ffc107">SCL</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- 2. SENSOR 2: DS18B20 WATERPROOF TEMPERATURE SENSOR & TERMINAL (TOP CENTER) -->
+  <!-- ====================================================================== -->
+  <!-- Metallic Probe -->
+  <g id="mod-ds18b20-probe" transform="translate(245, 80)" filter="url(#shadow)">
+    <!-- Stainless Steel Metallic Probe Body -->
+    <rect x="0" y="0" width="170" height="42" rx="6" fill="url(#metalGrad)" stroke="#546e7a" stroke-width="1.5"/>
+    <rect x="6" y="5" width="24" height="32" rx="3" fill="#263238"/>
+    <text x="95" y="22" fill="#1b262c" font-size="11" font-weight="bold" text-anchor="middle">DS18B20 PROBE</text>
+    <text x="95" y="34" fill="#37474f" font-size="8.5" text-anchor="middle">Waterproof Temperature</text>
+    <!-- Thick Black Cable -->
+    <path d="M 0,21 Q -20,21 -20,50 L -20,70" fill="none" stroke="#212121" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Terminal Block for DS18B20 (Spacious, No Clipping) -->
+  <g id="mod-ds18b20-term" transform="translate(230, 140)" filter="url(#shadow)">
+    <rect x="0" y="0" width="190" height="85" rx="6" fill="#1e262c" stroke="#37474f" stroke-width="1.5"/>
+    <text x="95" y="18" fill="#eceff1" font-size="10" font-weight="bold" text-anchor="middle">TERMINAL BLOCK DS18B20</text>
+
+    <!-- 3 Terminals: VCC, DQ, GND -->
+    <!-- Terminal 1: VCC (Merah) -->
+    <g transform="translate(32, 28)">
+      <circle cx="0" cy="30" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
+      <text x="0" y="0" fill="#ff5252" font-size="9" font-weight="bold" text-anchor="middle">VCC</text>
+      <text x="0" y="11" fill="#b0bec5" font-size="7.5" text-anchor="middle">(Merah)</text>
+      <text x="0" y="47" fill="#ff8a80" font-size="7.5" text-anchor="middle">3.3V / 5V</text>
+    </g>
+
+    <!-- Terminal 2: DQ (Kuning) -->
+    <g transform="translate(95, 28)">
+      <circle cx="0" cy="30" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
+      <text x="0" y="0" fill="#00e676" font-size="9" font-weight="bold" text-anchor="middle">DQ</text>
+      <text x="0" y="11" fill="#b0bec5" font-size="7.5" text-anchor="middle">(Kuning)</text>
+      <text x="0" y="47" fill="#69f0ae" font-size="7.5" text-anchor="middle">Data 1-Wire</text>
+    </g>
+
+    <!-- Terminal 3: GND (Hitam) -->
+    <g transform="translate(158, 28)">
+      <circle cx="0" cy="30" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
+      <text x="0" y="0" fill="#90a4ae" font-size="9" font-weight="bold" text-anchor="middle">GND</text>
+      <text x="0" y="11" fill="#b0bec5" font-size="7.5" text-anchor="middle">(Hitam)</text>
+      <text x="0" y="47" fill="#cfd8dc" font-size="7.5" text-anchor="middle">Ground</text>
+    </g>
+  </g>
+
+  <!-- 4.7k Resistor between DQ and 3.3V (Logic Safety) -->
+  <g id="mod-pullup-resistor" transform="translate(255, 245)" filter="url(#shadow)">
+    <!-- Leads -->
+    <line x1="0" y1="12" x2="25" y2="12" stroke="#b0bec5" stroke-width="2.5"/>
+    <line x1="85" y1="12" x2="110" y2="12" stroke="#b0bec5" stroke-width="2.5"/>
+    <!-- Body -->
+    <rect x="25" y="2" width="60" height="20" rx="6" fill="url(#resistorBody)" stroke="#8d6e63" stroke-width="1.5"/>
+    <!-- Bands: Yellow(4), Violet(7), Red(x100), Gold(5%) -->
+    <rect x="36" y="2" width="5" height="20" fill="#f1c40f"/>
+    <rect x="46" y="2" width="5" height="20" fill="#8e44ad"/>
+    <rect x="56" y="2" width="5" height="20" fill="#e74c3c"/>
+    <rect x="70" y="2" width="4" height="20" fill="#ffd700"/>
+    <circle cx="0" cy="12" r="3.5" fill="#00e676"/>
+    <circle cx="110" cy="12" r="3.5" fill="#ff7043"/>
+    <text x="55" y="-5" fill="#ffd54f" font-size="9.5" font-weight="bold" text-anchor="middle">Pull-Up 4.7 kΩ</text>
+    <text x="55" y="32" fill="#b0bec5" font-size="7.5" text-anchor="middle">(DQ ke 3.3V Logic Safety)</text>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- 3. DISPLAY: LCD 1602 I2C DISPLAY (TOP RIGHT) -->
+  <!-- ====================================================================== -->
+  <g id="mod-lcd1602" transform="translate(935, 80)" filter="url(#shadow)">
+    <!-- Black Outer Bezel -->
+    <rect x="0" y="0" width="310" height="155" rx="6" fill="#1b1b1b" stroke="#333" stroke-width="2"/>
+    <!-- Blue Backlight Screen -->
+    <rect x="18" y="16" width="274" height="68" rx="3" fill="url(#lcdScreen)" stroke="#0d47a1" stroke-width="1.5"/>
+    <!-- Screen Pixel Text -->
+    <text x="28" y="40" fill="#ffffff" font-family="Courier New, monospace" font-size="12.5" font-weight="bold">PREDICTIVE MAINT</text>
+    <text x="28" y="60" fill="#80d8ff" font-family="Courier New, monospace" font-size="11.5">STATUS: NORMAL</text>
+    <text x="28" y="76" fill="#b3e5fc" font-family="Courier New, monospace" font-size="9.5">T:35.0C  R:0.25g</text>
+
+    <!-- Subtitle -->
+    <text x="155" y="100" fill="#cfd8dc" font-size="10.5" font-weight="bold" text-anchor="middle">LCD 16x2 I2C PCF8574 (0x27)</text>
+
+    <!-- I2C Backpack 4 Pins -->
+    <g transform="translate(25, 110)">
+      <rect x="0" y="0" width="95" height="30" rx="3" fill="#2e7d32" stroke="#1b5e20"/>
+      <!-- 4 Pins: GND, VCC, SDA, SCL -->
+      <circle cx="14" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
+      <circle cx="38" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
+      <circle cx="62" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
+      <circle cx="84" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
+      <text x="14" y="38" fill="#90a4ae" font-size="8" font-weight="bold" text-anchor="middle">GND</text>
+      <text x="38" y="38" fill="#ff5252" font-size="8" font-weight="bold" text-anchor="middle">VCC</text>
+      <text x="62" y="38" fill="#2979ff" font-size="8" font-weight="bold" text-anchor="middle">SDA</text>
+      <text x="84" y="38" fill="#ffc107" font-size="8" font-weight="bold" text-anchor="middle">SCL</text>
+    </g>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- 4. OUTPUT: ACTIVE BUZZER ALARM (RIGHT MIDDLE) -->
+  <!-- ====================================================================== -->
+  <g id="mod-buzzer" transform="translate(1030, 270)" filter="url(#shadow)">
+    <!-- Cylinder Body -->
+    <circle cx="65" cy="65" r="55" fill="#212121" stroke="#37474f" stroke-width="2.5"/>
+    <circle cx="65" cy="65" r="16" fill="#121212" stroke="#263238" stroke-width="2"/>
+    <text x="35" y="40" fill="#ef5350" font-size="20" font-weight="bold">+</text>
+    <text x="65" y="100" fill="#ffffff" font-size="10.5" font-weight="bold" text-anchor="middle">ACTIVE BUZZER</text>
+    <text x="65" y="114" fill="#90a4ae" font-size="8.5" text-anchor="middle">GPIO 18 / Pin 12</text>
+
+    <!-- Two Terminal Pins -->
+    <circle cx="42" cy="132" r="5" fill="#ffd700" stroke="#b8860b"/>
+    <circle cx="88" cy="132" r="5" fill="#ffd700" stroke="#b8860b"/>
+    <text x="42" y="148" fill="#ff5252" font-size="9" font-weight="bold" text-anchor="middle">Pin 1 (+)</text>
+    <text x="88" y="148" fill="#90a4ae" font-size="9" font-weight="bold" text-anchor="middle">Pin 2 (-)</text>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- 5. RASPBERRY PI 4 MODEL B BOARD (CENTER LOWER) -->
+  <!-- ====================================================================== -->
+  <g id="rpi4-board" transform="translate(450, 340)" filter="url(#shadow)">
     <!-- Main PCB Green Board (85mm x 56mm scaled) -->
-    <rect x="0" y="0" width="460" height="340" rx="18" fill="#1b5e20" stroke="#2e7d32" stroke-width="3"/>
+    <rect x="0" y="0" width="480" height="300" rx="16" fill="#1b5e20" stroke="#2e7d32" stroke-width="3"/>
     
     <!-- Mounting Holes with Copper Rings -->
-    <g fill="#181a20" stroke="#ffd700" stroke-width="2.5">
-      <circle cx="22" cy="22" r="9"/>
-      <circle cx="22" cy="318" r="9"/>
-      <circle cx="438" cy="22" r="9"/>
-      <circle cx="438" cy="318" r="9"/>
+    <g fill="#14171f" stroke="#ffd700" stroke-width="2.5">
+      <circle cx="22" cy="22" r="8"/>
+      <circle cx="22" cy="278" r="8"/>
+      <circle cx="458" cy="22" r="8"/>
+      <circle cx="458" cy="278" r="8"/>
     </g>
 
     <!-- Broadcom BCM2711 SoC CPU (Center Metallic Heatspreader) -->
-    <rect x="180" y="130" width="85" height="85" rx="5" fill="url(#metalGradient)" stroke="#546e7a" stroke-width="2"/>
-    <text x="222" y="168" fill="#263238" font-size="11" font-weight="bold" text-anchor="middle">BROADCOM</text>
-    <text x="222" y="184" fill="#37474f" font-size="10" font-weight="bold" text-anchor="middle">BCM2711</text>
-    <text x="222" y="198" fill="#455a64" font-size="8.5" text-anchor="middle">Quad-Core A72</text>
+    <rect x="185" y="110" width="85" height="85" rx="5" fill="url(#metalGrad)" stroke="#546e7a" stroke-width="2"/>
+    <text x="227" y="146" fill="#1b262c" font-size="11" font-weight="bold" text-anchor="middle">BROADCOM</text>
+    <text x="227" y="162" fill="#263238" font-size="10" font-weight="bold" text-anchor="middle">BCM2711</text>
+    <text x="227" y="176" fill="#37474f" font-size="8.5" text-anchor="middle">Quad-Core A72</text>
 
     <!-- RAM IC (Black) -->
-    <rect x="190" y="225" width="65" height="40" rx="3" fill="#212121" stroke="#424242" stroke-width="1.5"/>
-    <text x="222" y="250" fill="#9e9e9e" font-size="9" text-anchor="middle">LPDDR4</text>
+    <rect x="195" y="205" width="65" height="38" rx="3" fill="#212121" stroke="#424242" stroke-width="1.5"/>
+    <text x="227" y="228" fill="#9e9e9e" font-size="9" text-anchor="middle">LPDDR4</text>
 
     <!-- Silkscreen Branding -->
-    <text x="120" y="270" fill="#ffffff" font-size="14" font-weight="bold">Raspberry Pi 4</text>
-    <text x="120" y="286" fill="#a5d6a7" font-size="11">Model B Rev 1.5</text>
+    <text x="120" y="245" fill="#ffffff" font-size="13" font-weight="bold">Raspberry Pi 4</text>
+    <text x="120" y="260" fill="#a5d6a7" font-size="10.5">Model B Rev 1.5</text>
 
-    <!-- Ports on Bottom Edge: USB-C Power, Micro HDMI 0, Micro HDMI 1, Audio Jack -->
+    <!-- Bottom Edge Ports -->
     <!-- USB-C Power Port -->
-    <rect x="30" y="325" width="45" height="24" rx="4" fill="url(#metalGradient)" stroke="#546e7a"/>
-    <text x="52" y="315" fill="#ffffff" font-size="8" text-anchor="middle">PWR (5V 3A)</text>
+    <rect x="30" y="285" width="45" height="20" rx="4" fill="url(#metalGrad)" stroke="#546e7a"/>
+    <text x="52" y="278" fill="#ffffff" font-size="7.5" text-anchor="middle">PWR (5V 3A)</text>
 
     <!-- Micro HDMI Ports -->
-    <rect x="95" y="328" width="30" height="20" rx="3" fill="url(#metalGradient)" stroke="#546e7a"/>
-    <text x="110" y="315" fill="#ffffff" font-size="8" text-anchor="middle">HDMI 0</text>
-    <rect x="140" y="328" width="30" height="20" rx="3" fill="url(#metalGradient)" stroke="#546e7a"/>
-    <text x="155" y="315" fill="#ffffff" font-size="8" text-anchor="middle">HDMI 1</text>
+    <rect x="95" y="288" width="28" height="16" rx="3" fill="url(#metalGrad)" stroke="#546e7a"/>
+    <text x="109" y="278" fill="#ffffff" font-size="7.5" text-anchor="middle">HDMI 0</text>
+    <rect x="135" y="288" width="28" height="16" rx="3" fill="url(#metalGrad)" stroke="#546e7a"/>
+    <text x="149" y="278" fill="#ffffff" font-size="7.5" text-anchor="middle">HDMI 1</text>
 
     <!-- 3.5mm AV Audio Jack -->
-    <rect x="190" y="322" width="32" height="26" rx="3" fill="#212121" stroke="#424242"/>
-    <circle cx="206" cy="342" r="5" fill="#37474f"/>
-    <text x="206" y="315" fill="#ffffff" font-size="8" text-anchor="middle">A/V</text>
+    <rect x="180" y="282" width="30" height="24" rx="3" fill="#212121" stroke="#424242"/>
+    <circle cx="195" cy="298" r="4.5" fill="#37474f"/>
+    <text x="195" y="278" fill="#ffffff" font-size="7.5" text-anchor="middle">A/V</text>
 
-    <!-- Ports on Right Edge: USB 3.0 (Blue), USB 2.0 (Black), Ethernet Gigabit -->
+    <!-- Right Edge Ports -->
     <!-- Gigabit Ethernet RJ45 -->
-    <rect x="420" y="45" width="55" height="75" rx="4" fill="url(#metalGradient)" stroke="#546e7a"/>
-    <text x="447" y="90" fill="#263238" font-size="10" font-weight="bold" text-anchor="middle" transform="rotate(-90, 447, 90)">ETHERNET</text>
+    <rect x="440" y="40" width="50" height="68" rx="4" fill="url(#metalGrad)" stroke="#546e7a"/>
+    <text x="465" y="78" fill="#1b262c" font-size="9" font-weight="bold" text-anchor="middle" transform="rotate(-90, 465, 78)">ETHERNET</text>
 
     <!-- Dual USB 3.0 Ports (Blue Core) -->
-    <rect x="420" y="140" width="55" height="75" rx="4" fill="url(#metalGradient)" stroke="#546e7a"/>
-    <rect x="445" y="148" width="22" height="25" rx="2" fill="url(#usb3Blue)"/>
-    <rect x="445" y="180" width="22" height="25" rx="2" fill="url(#usb3Blue)"/>
-    <text x="435" y="180" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle" transform="rotate(-90, 435, 180)">USB 3.0</text>
+    <rect x="440" y="120" width="50" height="68" rx="4" fill="url(#metalGrad)" stroke="#546e7a"/>
+    <rect x="460" y="128" width="20" height="22" rx="2" fill="url(#usb3Blue)"/>
+    <rect x="460" y="156" width="20" height="22" rx="2" fill="url(#usb3Blue)"/>
+    <text x="450" y="156" fill="#ffffff" font-size="8.5" font-weight="bold" text-anchor="middle" transform="rotate(-90, 450, 156)">USB 3.0</text>
 
     <!-- Dual USB 2.0 Ports (Black Core) -->
-    <rect x="420" y="235" width="55" height="75" rx="4" fill="url(#metalGradient)" stroke="#546e7a"/>
-    <rect x="445" y="243" width="22" height="25" rx="2" fill="#212121"/>
-    <rect x="445" y="275" width="22" height="25" rx="2" fill="#212121"/>
-    <text x="435" y="275" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle" transform="rotate(-90, 435, 275)">USB 2.0</text>
+    <rect x="440" y="200" width="50" height="68" rx="4" fill="url(#metalGrad)" stroke="#546e7a"/>
+    <rect x="460" y="208" width="20" height="22" rx="2" fill="#212121"/>
+    <rect x="460" y="236" width="20" height="22" rx="2" fill="#212121"/>
+    <text x="450" y="236" fill="#ffffff" font-size="8.5" font-weight="bold" text-anchor="middle" transform="rotate(-90, 450, 236)">USB 2.0</text>
 
     <!-- ================= 40-PIN GPIO HEADER (TOP EDGE) ================= -->
-    <!-- Header runs from X=60 to X=390 (330px wide), Y=12 to Y=48 (36px high) -->
-    <!-- 2 rows x 20 columns: Top row = Even pins (2,4,...,40), Bottom row = Odd pins (1,3,...,39) -->
-    <rect x="55" y="8" width="345" height="42" rx="4" fill="#151515" stroke="#333" stroke-width="1.5"/>
+    <!-- Header runs from X=55 to X=425 (370px wide), Y=8 to Y=54 (46px high) -->
+    <rect x="55" y="8" width="370" height="46" rx="4" fill="#111" stroke="#333" stroke-width="1.5"/>
     
-    <!-- Render 20 pin pairs (Col 0 to 19: X = 70 + i * 16.5) -->
-    <!-- Pin 1=Bottom(38), Pin 2=Top(20) -->
-    <!-- Highlighted Active Pins:
-         Pin 1 (3V3): X=70, Y=38
-         Pin 2 (5V): X=70, Y=20
-         Pin 3 (GPIO 2 SDA): X=86.5, Y=38
-         Pin 4 (5V): X=86.5, Y=20
-         Pin 5 (GPIO 3 SCL): X=103, Y=38
-         Pin 6 (GND): X=103, Y=20
-         Pin 7 (GPIO 4 1-Wire): X=119.5, Y=38
-         Pin 9 (GND): X=136, Y=38
-         Pin 12 (GPIO 18 Buzzer): X=160.75, Y=20
-         Pin 14 (GND): X=177.25, Y=20
-         Pin 17 (3V3 CS): X=202, Y=38
-         Pin 20 (GND): X=226.75, Y=20
-         Pin 25 (GND SDO): X=268, Y=38
-    -->
-    <g id="header-pins">
-      <!-- Inactive pins grey -->
-      <g fill="#ffd700">
-        <!-- Generate generic dots for aesthetic completeness -->
-        <circle cx="70" cy="20" r="3.5"/><!-- 2: 5V -->
-        <circle cx="70" cy="38" r="3.5"/><!-- 1: 3V3 -->
-        <circle cx="86.5" cy="20" r="3.5"/><!-- 4: 5V -->
-        <circle cx="86.5" cy="38" r="3.5"/><!-- 3: SDA -->
-        <circle cx="103" cy="20" r="3.5"/><!-- 6: GND -->
-        <circle cx="103" cy="38" r="3.5"/><!-- 5: SCL -->
-        <circle cx="119.5" cy="20" r="3.5"/><circle cx="119.5" cy="38" r="3.5"/><!-- 7: DQ -->
-        <circle cx="136" cy="20" r="3.5"/><circle cx="136" cy="38" r="3.5"/><!-- 9: GND -->
-        <circle cx="152.5" cy="20" r="3.5"/><circle cx="152.5" cy="38" r="3.5"/>
-        <circle cx="169" cy="20" r="3.5"/><circle cx="169" cy="38" r="3.5"/><!-- 12: BZ -->
-        <circle cx="185.5" cy="20" r="3.5"/><circle cx="185.5" cy="38" r="3.5"/><!-- 14: GND -->
-        <circle cx="202" cy="20" r="3.5"/><circle cx="202" cy="38" r="3.5"/><!-- 17: 3V3 -->
-        <circle cx="218.5" cy="20" r="3.5"/><circle cx="218.5" cy="38" r="3.5"/>
-        <circle cx="235" cy="20" r="3.5"/><circle cx="235" cy="38" r="3.5"/><!-- 20: GND -->
-        <circle cx="251.5" cy="20" r="3.5"/><circle cx="251.5" cy="38" r="3.5"/>
-        <circle cx="268" cy="20" r="3.5"/><circle cx="268" cy="38" r="3.5"/><!-- 25: GND -->
-        <circle cx="284.5" cy="20" r="3.5"/><circle cx="284.5" cy="38" r="3.5"/>
-        <circle cx="301" cy="20" r="3.5"/><circle cx="301" cy="38" r="3.5"/>
-        <circle cx="317.5" cy="20" r="3.5"/><circle cx="317.5" cy="38" r="3.5"/>
-        <circle cx="334" cy="20" r="3.5"/><circle cx="334" cy="38" r="3.5"/>
-        <circle cx="350.5" cy="20" r="3.5"/><circle cx="350.5" cy="38" r="3.5"/>
-        <circle cx="367" cy="20" r="3.5"/><circle cx="367" cy="38" r="3.5"/>
-        <circle cx="383.5" cy="20" r="3.5"/><circle cx="383.5" cy="38" r="3.5"/>
+    <!-- Render 20 pin pairs (Col 0 to 19: X = 68 + i * 17) -->
+    <!-- Pin 1=Bottom(40), Pin 2=Top(20) -->
+    <g id="header-pin-dots">
+      <!-- Inactive pins grey-gold -->
+      <g fill="#424242" stroke="#212121" stroke-width="0.5">
+        <!-- Loop generic dots -->
+        <!-- Col 3: Pin 8 -->
+        <circle cx="119" cy="20" r="3.2"/>
+        <!-- Col 4: Pin 10 -->
+        <circle cx="136" cy="20" r="3.2"/>
+        <!-- Col 5: Pin 11 -->
+        <circle cx="153" cy="40" r="3.2"/>
+        <!-- Col 6: Pin 13 -->
+        <circle cx="170" cy="40" r="3.2"/>
+        <!-- Col 7: Pin 15, 16 -->
+        <circle cx="187" cy="20" r="3.2"/><circle cx="187" cy="40" r="3.2"/>
+        <!-- Col 8: Pin 18 -->
+        <circle cx="204" cy="20" r="3.2"/>
+        <!-- Col 9: Pin 19 -->
+        <circle cx="221" cy="40" r="3.2"/>
+        <!-- Col 10: Pin 21, 22 -->
+        <circle cx="238" cy="20" r="3.2"/><circle cx="238" cy="40" r="3.2"/>
+        <!-- Col 11: Pin 23, 24 -->
+        <circle cx="255" cy="20" r="3.2"/><circle cx="255" cy="40" r="3.2"/>
+        <!-- Col 12: Pin 26 -->
+        <circle cx="272" cy="20" r="3.2"/>
+        <!-- Col 13: Pin 27, 28 -->
+        <circle cx="289" cy="20" r="3.2"/><circle cx="289" cy="40" r="3.2"/>
+        <!-- Col 14: Pin 29, 30 -->
+        <circle cx="306" cy="20" r="3.2"/><circle cx="306" cy="40" r="3.2"/>
+        <!-- Col 15: Pin 31, 32 -->
+        <circle cx="323" cy="20" r="3.2"/><circle cx="323" cy="40" r="3.2"/>
+        <!-- Col 16: Pin 33, 34 -->
+        <circle cx="340" cy="20" r="3.2"/><circle cx="340" cy="40" r="3.2"/>
+        <!-- Col 17: Pin 35, 36 -->
+        <circle cx="357" cy="20" r="3.2"/><circle cx="357" cy="40" r="3.2"/>
+        <!-- Col 18: Pin 37, 38 -->
+        <circle cx="374" cy="20" r="3.2"/><circle cx="374" cy="40" r="3.2"/>
+        <!-- Col 19: Pin 39, 40 -->
+        <circle cx="391" cy="20" r="3.2"/><circle cx="391" cy="40" r="3.2"/>
       </g>
-      <!-- Header row labels -->
-      <text x="58" y="4" fill="#e0e0e0" font-size="8.5" font-weight="bold">Pin 2 (Top Even)</text>
-      <text x="395" y="4" fill="#e0e0e0" font-size="8.5" font-weight="bold" text-anchor="end">Pin 40</text>
-      <text x="58" y="58" fill="#e0e0e0" font-size="8.5" font-weight="bold">Pin 1 (Btm Odd)</text>
-      <text x="395" y="58" fill="#e0e0e0" font-size="8.5" font-weight="bold" text-anchor="end">Pin 39</text>
+
+      <!-- ACTIVE HIGHLIGHTED PINS WITH COLOR-CODING -->
+      <!-- Pin 2 (Top, Col 0): 5V Red -->
+      <circle cx="68" cy="20" r="4" fill="#ff5252" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 1 (Btm, Col 0): 3.3V Orange -->
+      <circle cx="68" cy="40" r="4" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 4 (Top, Col 1): 5V Red -->
+      <circle cx="85" cy="20" r="4" fill="#ff5252" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 3 (Btm, Col 1): SDA Blue -->
+      <circle cx="85" cy="40" r="4" fill="#2979ff" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 6 (Top, Col 2): GND Slate -->
+      <circle cx="102" cy="20" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 5 (Btm, Col 2): SCL Yellow -->
+      <circle cx="102" cy="40" r="4" fill="#ffc107" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 7 (Btm, Col 3): DQ Green -->
+      <circle cx="119" cy="40" r="4" fill="#00e676" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 9 (Btm, Col 4): GND Slate -->
+      <circle cx="136" cy="40" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 12 (Top, Col 5): GPIO 18 Buzzer (+) Coral -->
+      <circle cx="153" cy="20" r="4" fill="#ff5252" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 14 (Top, Col 6): Buzzer (-) GND Slate -->
+      <circle cx="170" cy="20" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 17 (Btm, Col 8): 3.3V ADXL345 CS Orange -->
+      <circle cx="204" cy="40" r="4" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 20 (Top, Col 9): LCD GND Slate -->
+      <circle cx="221" cy="20" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
+      <!-- Pin 25 (Btm, Col 12): ADXL345 SDO GND Slate -->
+      <circle cx="272" cy="40" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
     </g>
+
+    <!-- Header Labels -->
+    <text x="56" y="4" fill="#ffffff" font-size="8" font-weight="bold">Pin 2 (Top Even)</text>
+    <text x="425" y="4" fill="#90a4ae" font-size="8" font-weight="bold" text-anchor="end">Pin 40</text>
+    <text x="56" y="64" fill="#ffffff" font-size="8" font-weight="bold">Pin 1 (Btm Odd)</text>
+    <text x="425" y="64" fill="#90a4ae" font-size="8" font-weight="bold" text-anchor="end">Pin 39</text>
   </g>
 
   <!-- ====================================================================== -->
-  <!-- 2. SENSOR 1: ADXL345 ACCELEROMETER MODULE (TOP LEFT) -->
+  <!-- PIN CALLOUT BADGES ABOVE/BELOW RASPBERRY PI HEADER -->
+  <!-- Absolute Header Pin X: 450 + 68 + col * 17 = 518 + col * 17 -->
+  <!-- Col 0: X=518 (P1, P2)   Col 1: X=535 (P3, P4)   Col 2: X=552 (P5, P6) -->
+  <!-- Col 3: X=569 (P7, P8)   Col 4: X=586 (P9, P10)  Col 5: X=603 (P11, P12) -->
+  <!-- Col 6: X=620 (P13, P14) Col 8: X=654 (P17, P18) Col 9: X=671 (P19, P20) -->
+  <!-- Col 12: X=722 (P25, P26) -->
   <!-- ====================================================================== -->
-  <g id="mod-adxl345" transform="translate(60, 95)" filter="url(#shadow)">
-    <!-- Blue PCB -->
-    <rect x="0" y="0" width="180" height="210" rx="8" fill="#0d47a1" stroke="#1976d2" stroke-width="2"/>
-    <!-- Mounting Holes -->
-    <circle cx="16" cy="16" r="7" fill="#181a20" stroke="#ffd700" stroke-width="1.5"/>
-    <circle cx="164" cy="16" r="7" fill="#181a20" stroke="#ffd700" stroke-width="1.5"/>
-    
-    <!-- ADXL345 QFN Chip (Black) -->
-    <rect x="62" y="50" width="56" height="56" rx="4" fill="#151515" stroke="#37474f" stroke-width="1.5"/>
-    <circle cx="72" cy="60" r="2.5" fill="#cfd8dc"/>
-    <text x="90" y="82" fill="#eceff1" font-size="9" font-weight="bold" text-anchor="middle">ADXL345</text>
-    <text x="90" y="94" fill="#90caf9" font-size="7.5" text-anchor="middle">3-AXIS ACCEL</text>
+  <g id="header-badges" font-size="7.5" font-weight="bold" text-anchor="middle">
+    <!-- TOP ROW BADGES (Y=334) -->
+    <!-- Pin 2: 5V Power -->
+    <rect x="506" y="325" width="24" height="13" rx="2" fill="#d32f2f"/>
+    <text x="518" y="334" fill="#ffffff">P2 5V</text>
 
-    <!-- Silk Labels -->
-    <text x="90" y="30" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">ADXL345 (FISIK)</text>
-    <text x="90" y="130" fill="#90caf9" font-size="9.5" text-anchor="middle">I2C: 0x53 (±4g)</text>
+    <!-- Pin 4: 5V Power -->
+    <rect x="523" y="325" width="24" height="13" rx="2" fill="#d32f2f"/>
+    <text x="535" y="334" fill="#ffffff">P4 5V</text>
 
-    <!-- 8 Header Pins at Bottom: VCC, GND, CS, INT1, INT2, SDO, SDA, SCL -->
-    <g transform="translate(10, 160)">
-      <g fill="#ffd700" stroke="#b8860b" stroke-width="1">
-        <rect x="0" y="0" width="16" height="40" rx="2"/>
-        <rect x="20" y="0" width="16" height="40" rx="2"/>
-        <rect x="40" y="0" width="16" height="40" rx="2"/>
-        <rect x="60" y="0" width="16" height="40" rx="2"/>
-        <rect x="80" y="0" width="16" height="40" rx="2"/>
-        <rect x="100" y="0" width="16" height="40" rx="2"/>
-        <rect x="120" y="0" width="16" height="40" rx="2"/>
-        <rect x="140" y="0" width="16" height="40" rx="2"/>
-      </g>
-      <!-- Holes -->
-      <g fill="#181a20">
-        <circle cx="8" cy="30" r="3.5"/><circle cx="28" cy="30" r="3.5"/><circle cx="48" cy="30" r="3.5"/>
-        <circle cx="68" cy="30" r="3.5"/><circle cx="88" cy="30" r="3.5"/><circle cx="108" cy="30" r="3.5"/>
-        <circle cx="128" cy="30" r="3.5"/><circle cx="148" cy="30" r="3.5"/>
-      </g>
-      <!-- Labels -->
-      <g font-size="8.5" fill="#ffffff" font-weight="bold" text-anchor="middle">
-        <text x="8" y="14" fill="#ff8a80">VCC</text>
-        <text x="28" y="14" fill="#81d4fa">GND</text>
-        <text x="48" y="14" fill="#ff8a80">CS</text>
-        <text x="68" y="14">INT1</text>
-        <text x="88" y="14">INT2</text>
-        <text x="108" y="14" fill="#81d4fa">SDO</text>
-        <text x="128" y="14" fill="#64b5f6">SDA</text>
-        <text x="148" y="14" fill="#ffd54f">SCL</text>
-      </g>
-    </g>
+    <!-- Pin 6: GND -->
+    <rect x="538" y="325" width="28" height="13" rx="2" fill="#37474f"/>
+    <text x="552" y="334" fill="#cfd8dc">P6 GND</text>
+
+    <!-- Pin 12: GPIO 18 (Buzzer +) -->
+    <rect x="587" y="325" width="32" height="13" rx="2" fill="#e64a19"/>
+    <text x="603" y="334" fill="#ffffff">P12 BZ+</text>
+
+    <!-- Pin 14: GND (Buzzer -) -->
+    <rect x="604" y="325" width="32" height="13" rx="2" fill="#37474f"/>
+    <text x="620" y="334" fill="#cfd8dc">P14 GND</text>
+
+    <!-- Pin 20: LCD GND -->
+    <rect x="655" y="325" width="32" height="13" rx="2" fill="#37474f"/>
+    <text x="671" y="334" fill="#cfd8dc">P20 GND</text>
+
+    <!-- BOTTOM ROW BADGES (Y=412) -->
+    <!-- Pin 1: 3.3V Power -->
+    <rect x="504" y="402" width="28" height="13" rx="2" fill="#e65100"/>
+    <text x="518" y="411" fill="#ffffff">P1 3V3</text>
+
+    <!-- Pin 3: SDA (GPIO 2) -->
+    <rect x="521" y="402" width="28" height="13" rx="2" fill="#1565c0"/>
+    <text x="535" y="411" fill="#ffffff">P3 SDA</text>
+
+    <!-- Pin 5: SCL (GPIO 3) -->
+    <rect x="538" y="402" width="28" height="13" rx="2" fill="#f57f17"/>
+    <text x="552" y="411" fill="#ffffff">P5 SCL</text>
+
+    <!-- Pin 7: DQ 1-Wire (GPIO 4) -->
+    <rect x="557" y="402" width="24" height="13" rx="2" fill="#2e7d32"/>
+    <text x="569" y="411" fill="#ffffff">P7 DQ</text>
+
+    <!-- Pin 9: GND -->
+    <rect x="572" y="402" width="28" height="13" rx="2" fill="#37474f"/>
+    <text x="586" y="411" fill="#cfd8dc">P9 GND</text>
+
+    <!-- Pin 17: 3.3V (ADXL CS) -->
+    <rect x="639" y="402" width="30" height="13" rx="2" fill="#e65100"/>
+    <text x="654" y="411" fill="#ffffff">P17 3V3</text>
+
+    <!-- Pin 25: GND (ADXL SDO) -->
+    <rect x="706" y="402" width="32" height="13" rx="2" fill="#37474f"/>
+    <text x="722" y="411" fill="#cfd8dc">P25 GND</text>
   </g>
 
   <!-- ====================================================================== -->
-  <!-- 3. SENSOR 2: DS18B20 WATERPROOF TEMPERATURE SENSOR (CENTER TOP) -->
-  <!-- ====================================================================== -->
-  <g id="mod-ds18b20" transform="translate(290, 95)" filter="url(#shadow)">
-    <!-- Stainless Steel Metallic Probe Body -->
-    <rect x="0" y="0" width="150" height="45" rx="6" fill="url(#metalGradient)" stroke="#546e7a" stroke-width="1.5"/>
-    <rect x="5" y="5" width="25" height="35" rx="3" fill="#37474f"/>
-    <text x="85" y="27" fill="#212121" font-size="11" font-weight="bold">DS18B20 PROBE</text>
-
-    <!-- Thick Black Cable coming out of probe -->
-    <path d="M 0,22.5 Q -30,22.5 -30,70 L -30,120" fill="none" stroke="#212121" stroke-width="8" stroke-linecap="round"/>
-    
-    <!-- Breakout Terminal Box (3 Wires) -->
-    <rect x="-65" y="120" width="70" height="90" rx="6" fill="#263238" stroke="#37474f" stroke-width="1.5"/>
-    <text x="-30" y="138" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">TERMINAL</text>
-
-    <!-- Solder/Screw Connectors -->
-    <!-- Red Wire: VCC (5V) -->
-    <circle cx="-50" cy="190" r="5" fill="#ffd700" stroke="#b8860b"/>
-    <text x="-50" y="165" fill="#ff5252" font-size="8" font-weight="bold" text-anchor="middle">VCC</text>
-    <text x="-50" y="175" fill="#b0bec5" font-size="7" text-anchor="middle">(Merah)</text>
-
-    <!-- Yellow Wire: DQ (Data) -->
-    <circle cx="-30" cy="190" r="5" fill="#ffd700" stroke="#b8860b"/>
-    <text x="-30" y="165" fill="#69f0ae" font-size="8" font-weight="bold" text-anchor="middle">DQ</text>
-    <text x="-30" y="175" fill="#b0bec5" font-size="7" text-anchor="middle">(Kuning)</text>
-
-    <!-- Black Wire: GND -->
-    <circle cx="-10" cy="190" r="5" fill="#ffd700" stroke="#b8860b"/>
-    <text x="-10" y="165" fill="#81d4fa" font-size="8" font-weight="bold" text-anchor="middle">GND</text>
-    <text x="-10" y="175" fill="#b0bec5" font-size="7" text-anchor="middle">(Hitam)</text>
-  </g>
-
-  <!-- 4.7k Resistor between DQ and 3.3V -->
-  <g id="pullup-resistor" transform="translate(290, 240)" filter="url(#shadow)">
-    <!-- Wire leads -->
-    <line x1="0" y1="15" x2="25" y2="15" stroke="#b0bec5" stroke-width="2.5"/>
-    <line x1="85" y1="15" x2="110" y2="15" stroke="#b0bec5" stroke-width="2.5"/>
-    <!-- Resistor Body -->
-    <rect x="25" y="4" width="60" height="22" rx="7" fill="url(#resistorGrad)" stroke="#8d6e63" stroke-width="1.5"/>
-    <!-- 4 Bands: Yellow (4), Violet (7), Red (x100), Gold (5%) -->
-    <rect x="36" y="4" width="5" height="22" fill="#f1c40f"/>
-    <rect x="46" y="4" width="5" height="22" fill="#8e44ad"/>
-    <rect x="56" y="4" width="5" height="22" fill="#e74c3c"/>
-    <rect x="70" y="4" width="4" height="22" fill="#ffd700"/>
-    <text x="55" y="-5" fill="#ffd54f" font-size="10" font-weight="bold" text-anchor="middle">4.7 kΩ Pull-Up</text>
-    <text x="55" y="38" fill="#b0bec5" font-size="8" text-anchor="middle">(Wajib ke 3.3V)</text>
-    <circle cx="0" cy="15" r="3.5" fill="#cfd8dc"/>
-    <circle cx="110" cy="15" r="3.5" fill="#cfd8dc"/>
-  </g>
-
-  <!-- ====================================================================== -->
-  <!-- 4. DISPLAY: LCD 1602 I2C DISPLAY (TOP RIGHT) -->
-  <!-- ====================================================================== -->
-  <g id="mod-lcd1602" transform="translate(980, 95)" filter="url(#shadow)">
-    <!-- Black Outer Bezel -->
-    <rect x="0" y="0" width="260" height="150" rx="6" fill="#1b1b1b" stroke="#333" stroke-width="2"/>
-    <!-- Blue Backlight Screen -->
-    <rect x="20" y="20" width="220" height="65" rx="3" fill="url(#lcdScreen)" stroke="#0d47a1" stroke-width="1.5"/>
-    <!-- Screen Pixel Grid Simulation & Text -->
-    <text x="30" y="45" fill="#ffffff" font-family="Courier New, monospace" font-size="13" font-weight="bold">PREDICTIVE MAINT</text>
-    <text x="30" y="68" fill="#80d8ff" font-family="Courier New, monospace" font-size="12">STATUS: NORMAL</text>
-    <text x="130" y="105" fill="#cfd8dc" font-size="11" font-weight="bold" text-anchor="middle">LCD 16x2 I2C (0x27)</text>
-
-    <!-- I2C Backpack 4 Pins (Bottom Left) -->
-    <g transform="translate(20, 115)">
-      <rect x="0" y="0" width="85" height="28" rx="3" fill="#2e7d32" stroke="#1b5e20"/>
-      <!-- 4 Pins: GND, VCC, SDA, SCL -->
-      <circle cx="12" cy="14" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <circle cx="32" cy="14" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <circle cx="52" cy="14" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <circle cx="72" cy="14" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <text x="12" y="38" fill="#81d4fa" font-size="8" font-weight="bold" text-anchor="middle">GND</text>
-      <text x="32" y="38" fill="#ff5252" font-size="8" font-weight="bold" text-anchor="middle">VCC</text>
-      <text x="52" y="38" fill="#64b5f6" font-size="8" font-weight="bold" text-anchor="middle">SDA</text>
-      <text x="72" y="38" fill="#ffd54f" font-size="8" font-weight="bold" text-anchor="middle">SCL</text>
-    </g>
-  </g>
-
-  <!-- ====================================================================== -->
-  <!-- 5. OUTPUT: ACTIVE BUZZER ALARM (RIGHT MIDDLE) -->
-  <!-- ====================================================================== -->
-  <g id="mod-buzzer" transform="translate(1020, 340)" filter="url(#shadow)">
-    <!-- Cylinder Body -->
-    <circle cx="70" cy="70" r="60" fill="#212121" stroke="#37474f" stroke-width="2.5"/>
-    <circle cx="70" cy="70" r="16" fill="#121212" stroke="#263238" stroke-width="2"/>
-    <text x="40" y="45" fill="#ef5350" font-size="22" font-weight="bold">+</text>
-    <text x="70" y="110" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">ACTIVE BUZZER</text>
-    <text x="70" y="124" fill="#90a4ae" font-size="9" text-anchor="middle">GPIO 18 / Pin 12</text>
-
-    <!-- Two Terminal Pins -->
-    <circle cx="45" cy="145" r="5" fill="#ffd700" stroke="#b8860b"/>
-    <circle cx="95" cy="145" r="5" fill="#ffd700" stroke="#b8860b"/>
-    <text x="45" y="162" fill="#ef5350" font-size="9.5" font-weight="bold" text-anchor="middle">Pin 1 (+)</text>
-    <text x="95" y="162" fill="#90a4ae" font-size="9.5" font-weight="bold" text-anchor="middle">Pin 2 (-)</text>
-  </g>
-
-  <!-- ====================================================================== -->
-  <!-- 6. WIRING CONNECTIONS WITH COLOR & GLOW -->
+  <!-- 6. WIRING CONNECTIONS (100% PIN-ACCURATE, ZERO WIRES ACROSS CPU) -->
+  <!-- Channels above header: Y = 230, 245, 260, 275, 290, 305, 320 -->
+  <!-- Header Top Pins: Y=360, Header Bottom Pins: Y=380 -->
   <!-- ====================================================================== -->
   <g id="wires" filter="url(#wireShadow)" stroke-linecap="round" stroke-linejoin="round">
 
-    <!-- ===== I2C BUS (SDA & SCL) SHARED TO RPI PIN 3 & PIN 5 ===== -->
-    <!-- WIRE 1: ADXL345 SDA (Pin 138, 285) & LCD SDA (Pin 1032, 229) -> RPi Pin 3 (X=566.5, Y=298) -->
-    <!-- ADXL345 SDA -> Joint -> RPi Pin 3 -->
-    <path d="M 198,285 L 198,380 L 566.5,380 L 566.5,298" fill="none" stroke="#2196f3" stroke-width="3.5"/>
-    <circle cx="198" cy="285" r="4" fill="#2196f3"/>
-    <!-- LCD SDA -> joins RPi Pin 3 -->
-    <path d="M 1032,229 L 1032,270 L 680,270 L 680,380" fill="none" stroke="#2196f3" stroke-width="3.5"/>
-    <circle cx="1032" cy="229" r="4" fill="#2196f3"/>
-    <circle cx="566.5" cy="298" r="4.5" fill="#2196f3" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- ==================== 5V POWER BUS (RED #e53935) ==================== -->
+    <!-- WIRE 1: DS18B20 Terminal VCC (X=262, Y=198) -> RPi Pin 2 (5V, X=518, Y=360) -->
+    <path d="M 262,198 L 262,230 L 518,230 L 518,360" fill="none" stroke="#e53935" stroke-width="3"/>
+    <circle cx="262" cy="198" r="4" fill="#e53935"/>
+    <circle cx="518" cy="360" r="4.5" fill="#e53935" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 2: ADXL345 SCL (Pin 218, 285) & LCD SCL (Pin 1052, 229) -> RPi Pin 5 (X=583, Y=298) -->
-    <path d="M 218,285 L 218,395 L 583,395 L 583,298" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
-    <circle cx="218" cy="285" r="4" fill="#f1c40f"/>
-    <!-- LCD SCL -> joins RPi Pin 5 -->
-    <path d="M 1052,229 L 1052,285 L 695,285 L 695,395" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
-    <circle cx="1052" cy="229" r="4" fill="#f1c40f"/>
-    <circle cx="583" cy="298" r="4.5" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- WIRE 2: LCD 1602 VCC (X=973, Y=225) -> RPi Pin 4 (5V, X=535, Y=360) -->
+    <path d="M 973,225 L 973,238 L 535,238 L 535,360" fill="none" stroke="#e53935" stroke-width="3"/>
+    <circle cx="973" cy="225" r="4" fill="#e53935"/>
+    <circle cx="535" cy="360" r="4.5" fill="#e53935" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- ===== 3.3V POWER RAILS TO RPI PIN 1 & PIN 17 ===== -->
-    <!-- WIRE 3: ADXL345 VCC (Pin 78, 285) & Resistor 3V3 Lead (Pin 400, 255) -> RPi Pin 1 (X=550, Y=298) -->
-    <path d="M 78,285 L 78,350 L 400,350 L 400,255" fill="none" stroke="#e91e63" stroke-width="3.5"/>
-    <path d="M 400,350 L 550,350 L 550,298" fill="none" stroke="#e91e63" stroke-width="3.5"/>
-    <circle cx="78" cy="285" r="4" fill="#e91e63"/>
-    <circle cx="400" cy="255" r="4" fill="#e91e63"/>
-    <circle cx="550" cy="298" r="4.5" fill="#e91e63" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- ==================== 3.3V POWER (ORANGE #ff7043) ==================== -->
+    <!-- WIRE 3: ADXL345 VCC (X=43, Y=212) -> Resistor Pin 2 (X=365, Y=257) -> RPi Pin 1 (3V3, X=518, Y=380) -->
+    <path d="M 43,212 L 43,288 L 365,288 L 365,257" fill="none" stroke="#ff7043" stroke-width="3"/>
+    <path d="M 365,288 L 500,288 L 500,380 L 518,380" fill="none" stroke="#ff7043" stroke-width="3"/>
+    <circle cx="43" cy="212" r="4" fill="#ff7043"/>
+    <circle cx="365" cy="257" r="4" fill="#ff7043"/>
+    <circle cx="518" cy="380" r="4.5" fill="#ff7043" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 4: ADXL345 CS (Pin 118, 285) -> RPi Pin 17 (3.3V, X=682, Y=298) Enables I2C mode -->
-    <path d="M 118,285 L 118,365 L 682,365 L 682,298" fill="none" stroke="#e91e63" stroke-width="3"/>
-    <circle cx="118" cy="285" r="4" fill="#e91e63"/>
-    <circle cx="682" cy="298" r="4" fill="#e91e63"/>
+    <!-- WIRE 4: ADXL345 CS (X=83, Y=212) -> RPi Pin 17 (3V3, X=654, Y=380) [Enables I2C Mode] -->
+    <path d="M 83,212 L 83,302 L 654,302 L 654,380" fill="none" stroke="#ff8a80" stroke-width="2.5"/>
+    <circle cx="83" cy="212" r="4" fill="#ff8a80"/>
+    <circle cx="654" cy="380" r="4" fill="#ff8a80" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- ===== 5V POWER TO RPI PIN 2 & PIN 4 ===== -->
-    <!-- WIRE 5: DS18B20 VCC (Pin 240, 285) -> RPi Pin 2 (5V, X=550, Y=280) -->
-    <path d="M 240,285 L 240,240 L 520,240 L 520,280 L 550,280" fill="none" stroke="#e74c3c" stroke-width="3.5"/>
-    <circle cx="240" cy="285" r="4" fill="#e74c3c"/>
-    <circle cx="550" cy="280" r="4.5" fill="#e74c3c" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- ==================== 1-WIRE DATA (GREEN #00e676) ==================== -->
+    <!-- WIRE 5: DS18B20 DQ (X=325, Y=198) + Resistor Pin 1 (X=255, Y=257) -> RPi Pin 7 (GPIO 4, X=569, Y=380) -->
+    <path d="M 325,198 L 325,250 L 255,250 L 255,257" fill="none" stroke="#00e676" stroke-width="3"/>
+    <path d="M 325,250 L 569,250 L 569,380" fill="none" stroke="#00e676" stroke-width="3"/>
+    <circle cx="325" cy="198" r="4" fill="#00e676"/>
+    <circle cx="255" cy="257" r="4" fill="#00e676"/>
+    <circle cx="569" cy="380" r="4.5" fill="#00e676" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 6: LCD 1602 VCC (Pin 1012, 229) -> RPi Pin 4 (5V, X=566.5, Y=280) -->
-    <path d="M 1012,229 L 1012,255 L 750,255 L 750,280 L 566.5,280" fill="none" stroke="#e74c3c" stroke-width="3.5"/>
-    <circle cx="1012" cy="229" r="4" fill="#e74c3c"/>
-    <circle cx="566.5" cy="280" r="4" fill="#e74c3c"/>
+    <!-- ==================== I2C BUS: SDA (BLUE #2979ff) ==================== -->
+    <!-- WIRE 6: ADXL345 SDA (X=163, Y=212) & LCD 1602 SDA (X=997, Y=225) -> RPi Pin 3 (GPIO 2, X=535, Y=380) -->
+    <path d="M 163,212 L 163,262 L 526,262 L 526,380 L 535,380" fill="none" stroke="#2979ff" stroke-width="3"/>
+    <circle cx="163" cy="212" r="4" fill="#2979ff"/>
+    <path d="M 997,225 L 997,262 L 526,262" fill="none" stroke="#2979ff" stroke-width="3"/>
+    <circle cx="997" cy="225" r="4" fill="#2979ff"/>
+    <circle cx="535" cy="380" r="4.5" fill="#2979ff" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- ===== DS18B20 1-WIRE DATA (GPIO 4 / PIN 7) ===== -->
-    <!-- WIRE 7: DS18B20 DQ (Pin 260, 285) + Resistor Lead 1 (Pin 290, 255) -> RPi Pin 7 (X=599.5, Y=298) -->
-    <path d="M 260,285 L 260,255 L 290,255" fill="none" stroke="#2ecc71" stroke-width="3.5"/>
-    <path d="M 290,255 L 340,255 L 340,410 L 599.5,410 L 599.5,298" fill="none" stroke="#2ecc71" stroke-width="3.5"/>
-    <circle cx="260" cy="285" r="4" fill="#2ecc71"/>
-    <circle cx="290" cy="255" r="4" fill="#2ecc71"/>
-    <circle cx="599.5" cy="298" r="4.5" fill="#2ecc71" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- ==================== I2C BUS: SCL (YELLOW #ffc107) ==================== -->
+    <!-- WIRE 7: ADXL345 SCL (X=183, Y=212) & LCD 1602 SCL (X=1019, Y=225) -> RPi Pin 5 (GPIO 3, X=552, Y=380) -->
+    <path d="M 183,212 L 183,275 L 545,275 L 545,380 L 552,380" fill="none" stroke="#ffc107" stroke-width="3"/>
+    <circle cx="183" cy="212" r="4" fill="#ffc107"/>
+    <path d="M 1019,225 L 1019,275 L 545,275" fill="none" stroke="#ffc107" stroke-width="3"/>
+    <circle cx="1019" cy="225" r="4" fill="#ffc107"/>
+    <circle cx="552" cy="380" r="4.5" fill="#ffc107" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- ===== BUZZER ALARM (GPIO 18 / PIN 12 & GND / PIN 14) ===== -->
-    <!-- WIRE 8: Buzzer Pin 1 (+) (Pin 1065, 485) -> RPi Pin 12 (GPIO 18, X=649, Y=280) -->
-    <path d="M 1065,485 L 1065,520 L 780,520 L 780,280 L 649,280" fill="none" stroke="#e74c3c" stroke-width="3.5"/>
-    <circle cx="1065" cy="485" r="4" fill="#e74c3c"/>
-    <circle cx="649" cy="280" r="4.5" fill="#e74c3c" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- ==================== BUZZER ALARM (CORAL #ff5252 & SLATE #90a4ae) ==================== -->
+    <!-- WIRE 8: Buzzer Pin 1 (+) (X=1072, Y=402) -> RPi Pin 12 (GPIO 18 / PWM0, X=603, Y=360) -->
+    <path d="M 1072,402 L 1072,430 L 780,430 L 780,314 L 603,314 L 603,360" fill="none" stroke="#ff5252" stroke-width="3"/>
+    <circle cx="1072" cy="402" r="4" fill="#ff5252"/>
+    <circle cx="603" cy="360" r="4.5" fill="#ff5252" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 9: Buzzer Pin 2 (-) (Pin 1115, 485) -> RPi Pin 14 (GND, X=665.5, Y=280) -->
-    <path d="M 1115,485 L 1115,535 L 795,535 L 795,270 L 665.5,270 L 665.5,280" fill="none" stroke="#263238" stroke-width="3.5"/>
-    <circle cx="1115" cy="485" r="4" fill="#263238"/>
-    <circle cx="665.5" cy="280" r="4" fill="#263238"/>
+    <!-- WIRE 9: Buzzer Pin 2 (-) (X=1118, Y=402) -> RPi Pin 14 (GND, X=620, Y=360) -->
+    <path d="M 1118,402 L 1118,442 L 795,442 L 795,300 L 620,300 L 620,360" fill="none" stroke="#90a4ae" stroke-width="3"/>
+    <circle cx="1118" cy="402" r="4" fill="#90a4ae"/>
+    <circle cx="620" cy="360" r="4.5" fill="#90a4ae" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- ===== GROUND (GND) RAILS TO RPI PIN 6, 9, 20, 25 ===== -->
-    <!-- WIRE 10: DS18B20 GND (Pin 280, 285) -> RPi Pin 6 (GND, X=583, Y=280) -->
-    <path d="M 280,285 L 280,230 L 535,230 L 535,270 L 583,270 L 583,280" fill="none" stroke="#263238" stroke-width="3.5"/>
-    <circle cx="280" cy="285" r="4" fill="#263238"/>
-    <circle cx="583" cy="280" r="4" fill="#263238"/>
+    <!-- ==================== GROUND RAILS (SLATE #90a4ae) ==================== -->
+    <!-- WIRE 10: DS18B20 Terminal GND (X=388, Y=198) -> RPi Pin 6 (GND, X=552, Y=360) -->
+    <path d="M 388,198 L 388,314 L 552,314 L 552,360" fill="none" stroke="#90a4ae" stroke-width="3"/>
+    <circle cx="388" cy="198" r="4" fill="#90a4ae"/>
+    <circle cx="552" cy="360" r="4.5" fill="#90a4ae" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 11: ADXL345 GND (Pin 98, 285) -> RPi Pin 9 (GND, X=616, Y=298) -->
-    <path d="M 98,285 L 98,425 L 616,425 L 616,298" fill="none" stroke="#263238" stroke-width="3.5"/>
-    <circle cx="98" cy="285" r="4" fill="#263238"/>
-    <circle cx="616" cy="298" r="4" fill="#263238"/>
+    <!-- WIRE 11: ADXL345 GND (X=63, Y=212) -> RPi Pin 9 (GND, X=586, Y=380) -->
+    <path d="M 63,212 L 63,314 L 485,314 L 485,392 L 586,392 L 586,380" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
+    <circle cx="63" cy="212" r="4" fill="#90a4ae"/>
+    <circle cx="586" cy="380" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 12: ADXL345 SDO (Pin 178, 285) -> RPi Pin 25 (GND, X=748, Y=298) Sets Addr 0x53 -->
-    <path d="M 178,285 L 178,440 L 748,440 L 748,298" fill="none" stroke="#263238" stroke-width="3"/>
-    <circle cx="178" cy="285" r="4" fill="#263238"/>
-    <circle cx="748" cy="298" r="4" fill="#263238"/>
+    <!-- WIRE 12: ADXL345 SDO (X=143, Y=212) -> RPi Pin 25 (GND, X=722, Y=380) [Sets Addr 0x53] -->
+    <path d="M 143,212 L 143,326 L 475,326 L 475,404 L 722,404 L 722,380" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
+    <circle cx="143" cy="212" r="4" fill="#90a4ae"/>
+    <circle cx="722" cy="380" r="4" fill="#90a4ae" stroke="#ffffff" stroke-width="1.5"/>
 
-    <!-- WIRE 13: LCD 1602 GND (Pin 992, 229) -> RPi Pin 20 (GND, X=715, Y=280) -->
-    <path d="M 992,229 L 992,240 L 715,240 L 715,280" fill="none" stroke="#263238" stroke-width="3.5"/>
-    <circle cx="992" cy="229" r="4" fill="#263238"/>
-    <circle cx="715" cy="280" r="4" fill="#263238"/>
+    <!-- WIRE 13: LCD 1602 GND (X=949, Y=225) -> RPi Pin 20 (GND, X=671, Y=360) -->
+    <path d="M 949,225 L 949,288 L 671,288 L 671,360" fill="none" stroke="#90a4ae" stroke-width="3"/>
+    <circle cx="949" cy="225" r="4" fill="#90a4ae"/>
+    <circle cx="671" cy="360" r="4.5" fill="#90a4ae" stroke="#ffffff" stroke-width="1.5"/>
   </g>
 
   <!-- ====================================================================== -->
   <!-- 7. PINOUT CHEAT SHEET TABLE (BOTTOM FULL-WIDTH CARD) -->
   <!-- ====================================================================== -->
-  <g transform="translate(25, 620)" filter="url(#shadow)">
+  <g transform="translate(25, 665)" filter="url(#shadow)">
     <rect x="0" y="0" width="1230" height="235" rx="10" fill="#1e222d" stroke="#333a4d" stroke-width="1.5"/>
     
     <!-- Table Header Title -->
@@ -420,24 +530,24 @@
     <g transform="translate(25, 45)">
       <rect x="0" y="0" width="280" height="170" rx="6" fill="#141822" stroke="#283244"/>
       <text x="15" y="24" fill="#90caf9" font-size="12" font-weight="bold">1. ADXL345 (Getaran 3-Sumbu):</text>
-      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC  ➔ <tspan fill="#ff8a80" font-weight="bold">Pin 1</tspan> (3.3V Power)</text>
-      <text x="15" y="70" fill="#e0e0e0" font-size="11">• GND  ➔ <tspan fill="#81d4fa" font-weight="bold">Pin 9</tspan> (Ground)</text>
-      <text x="15" y="92" fill="#e0e0e0" font-size="11">• SDA  ➔ <tspan fill="#64b5f6" font-weight="bold">Pin 3</tspan> (GPIO 2, I2C1 SDA)</text>
-      <text x="15" y="114" fill="#e0e0e0" font-size="11">• SCL  ➔ <tspan fill="#ffd54f" font-weight="bold">Pin 5</tspan> (GPIO 3, I2C1 SCL)</text>
+      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC  ➔ <tspan fill="#ff7043" font-weight="bold">Pin 1</tspan> (3.3V Power)</text>
+      <text x="15" y="70" fill="#e0e0e0" font-size="11">• GND  ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 9</tspan> (Ground)</text>
+      <text x="15" y="92" fill="#e0e0e0" font-size="11">• SDA  ➔ <tspan fill="#2979ff" font-weight="bold">Pin 3</tspan> (GPIO 2, I2C1 SDA)</text>
+      <text x="15" y="114" fill="#e0e0e0" font-size="11">• SCL  ➔ <tspan fill="#ffc107" font-weight="bold">Pin 5</tspan> (GPIO 3, I2C1 SCL)</text>
       <text x="15" y="136" fill="#e0e0e0" font-size="11">• CS   ➔ <tspan fill="#ff8a80" font-weight="bold">Pin 17</tspan> (3.3V, Mode I2C)</text>
-      <text x="15" y="156" fill="#e0e0e0" font-size="11">• SDO  ➔ <tspan fill="#81d4fa" font-weight="bold">Pin 25</tspan> (GND, Alamat 0x53)</text>
+      <text x="15" y="156" fill="#e0e0e0" font-size="11">• SDO  ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 25</tspan> (GND, Alamat 0x53)</text>
     </g>
 
     <!-- Column 2: DS18B20 -->
     <g transform="translate(325, 45)">
       <rect x="0" y="0" width="280" height="170" rx="6" fill="#141822" stroke="#283244"/>
       <text x="15" y="24" fill="#81c784" font-size="12" font-weight="bold">2. DS18B20 (Suhu Waterproof):</text>
-      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC (Merah)  ➔ <tspan fill="#ff8a80" font-weight="bold">Pin 1 (3.3V)</tspan> / <tspan fill="#ff5252" font-weight="bold">Pin 2 (5V)</tspan></text>
-      <text x="15" y="72" fill="#e0e0e0" font-size="11">• GND (Hitam)  ➔ <tspan fill="#81d4fa" font-weight="bold">Pin 6</tspan> (Ground)</text>
-      <text x="15" y="96" fill="#e0e0e0" font-size="11">• DQ (Kuning)  ➔ <tspan fill="#69f0ae" font-weight="bold">Pin 7</tspan> (GPIO 4 1-Wire)</text>
+      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC (Merah)  ➔ <tspan fill="#ff5252" font-weight="bold">Pin 2 (5V)</tspan> / <tspan fill="#ff7043" font-weight="bold">Pin 1 (3.3V)</tspan></text>
+      <text x="15" y="72" fill="#e0e0e0" font-size="11">• GND (Hitam)  ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 6</tspan> (Ground)</text>
+      <text x="15" y="96" fill="#e0e0e0" font-size="11">• DQ (Kuning)  ➔ <tspan fill="#00e676" font-weight="bold">Pin 7</tspan> (GPIO 4 1-Wire)</text>
       <text x="15" y="125" fill="#ffd54f" font-size="10.5" font-weight="bold">⚠️ Resistor Pull-Up 4.7 kΩ:</text>
-      <text x="15" y="145" fill="#e0e0e0" font-size="10.5">Pasang antara <tspan fill="#69f0ae" font-weight="bold">Pin 7 (DQ)</tspan> ke <tspan fill="#ff8a80" font-weight="bold">Pin 1 (3.3V)</tspan></text>
-      <text x="15" y="159" fill="#90a4ae" font-size="9.5">*(Jangan ke 5V agar GPIO RPi tidak rusak)*</text>
+      <text x="15" y="145" fill="#e0e0e0" font-size="10.5">Pasang antara <tspan fill="#00e676" font-weight="bold">Pin 7 (DQ)</tspan> ke <tspan fill="#ff7043" font-weight="bold">Pin 1 (3.3V)</tspan></text>
+      <text x="15" y="159" fill="#90a4ae" font-size="9.5">*(Tarik ke 3.3V agar level GPIO 4 tetap aman)*</text>
     </g>
 
     <!-- Column 3: LCD 1602 I2C -->
@@ -445,9 +555,9 @@
       <rect x="0" y="0" width="280" height="170" rx="6" fill="#141822" stroke="#283244"/>
       <text x="15" y="24" fill="#64b5f6" font-size="12" font-weight="bold">3. LCD 1602 I2C Display:</text>
       <text x="15" y="52" fill="#e0e0e0" font-size="11">• VCC  ➔ <tspan fill="#ff5252" font-weight="bold">Pin 4</tspan> (5V Power Backlight)</text>
-      <text x="15" y="78" fill="#e0e0e0" font-size="11">• GND  ➔ <tspan fill="#81d4fa" font-weight="bold">Pin 20</tspan> (Ground)</text>
-      <text x="15" y="104" fill="#e0e0e0" font-size="11">• SDA  ➔ <tspan fill="#64b5f6" font-weight="bold">Pin 3</tspan> (GPIO 2, Parallel SDA)</text>
-      <text x="15" y="130" fill="#e0e0e0" font-size="11">• SCL  ➔ <tspan fill="#ffd54f" font-weight="bold">Pin 5</tspan> (GPIO 3, Parallel SCL)</text>
+      <text x="15" y="78" fill="#e0e0e0" font-size="11">• GND  ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 20</tspan> (Ground)</text>
+      <text x="15" y="104" fill="#e0e0e0" font-size="11">• SDA  ➔ <tspan fill="#2979ff" font-weight="bold">Pin 3</tspan> (GPIO 2, Parallel SDA)</text>
+      <text x="15" y="130" fill="#e0e0e0" font-size="11">• SCL  ➔ <tspan fill="#ffc107" font-weight="bold">Pin 5</tspan> (GPIO 3, Parallel SCL)</text>
       <text x="15" y="154" fill="#90a4ae" font-size="10">*(Alamat default I2C: 0x27 / 0x3F)*</text>
     </g>
 
@@ -456,7 +566,7 @@
       <rect x="0" y="0" width="280" height="170" rx="6" fill="#141822" stroke="#283244"/>
       <text x="15" y="24" fill="#ff8a80" font-size="12" font-weight="bold">4. Active Buzzer Alarm:</text>
       <text x="15" y="55" fill="#e0e0e0" font-size="11">• Positif (+) ➔ <tspan fill="#ff5252" font-weight="bold">Pin 12</tspan> (GPIO 18 / PWM0)</text>
-      <text x="15" y="85" fill="#e0e0e0" font-size="11">• Negatif (-) ➔ <tspan fill="#81d4fa" font-weight="bold">Pin 14</tspan> (Ground)</text>
+      <text x="15" y="85" fill="#e0e0e0" font-size="11">• Negatif (-) ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 14</tspan> (Ground)</text>
       <text x="15" y="125" fill="#81c784" font-size="10.5" font-weight="bold">✓ Status Operasional:</text>
       <text x="15" y="145" fill="#e0e0e0" font-size="10.5">Otomatis berbunyi saat suhu &gt; 50°C</text>
       <text x="15" y="159" fill="#e0e0e0" font-size="10.5">atau getaran total &gt; 2.50 g.</text>
