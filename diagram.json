@@ -6,29 +6,31 @@
     {
       "type": "board-pi-pico-w",
       "id": "pico",
-      "top": 0,
-      "left": 0,
+      "top": -118.45,
+      "left": -495.65,
       "attrs": {}
     },
     {
       "type": "wokwi-mpu6050",
       "id": "mpu1",
-      "top": 200,
-      "left": -200,
+      "top": -16.22,
+      "left": -313.88,
+      "rotate": 270,
       "attrs": {}
     },
     {
       "type": "wokwi-ds18b20",
       "id": "temp1",
-      "top": 60,
-      "left": -190,
+      "top": -87.53,
+      "left": -235.92,
       "attrs": {}
     },
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 120,
-      "left": -90,
+      "top": -24,
+      "left": -192.55,
+      "rotate": 90,
       "attrs": {
         "value": "4700"
       }
@@ -36,8 +38,8 @@
     {
       "type": "wokwi-buzzer",
       "id": "bz1",
-      "top": 60,
-      "left": 160,
+      "top": -208.8,
+      "left": -430.2,
       "attrs": {
         "hasLocalSound": "true"
       }
@@ -45,30 +47,147 @@
     {
       "type": "wokwi-lcd1602",
       "id": "lcd1",
-      "top": -160,
-      "left": -160,
+      "top": -243.2,
+      "left": -311.2,
       "attrs": {
         "pins": "i2c"
       }
     }
   ],
   "connections": [
-    [ "temp1:VCC", "pico:3V3", "red", [ "v0" ] ],
-    [ "temp1:GND", "pico:GND.8", "black", [ "v0" ] ],
-    [ "temp1:DQ", "pico:GP16", "green", [ "v0" ] ],
-    [ "r1:1", "temp1:DQ", "green", [ "v0" ] ],
-    [ "r1:2", "pico:3V3", "red", [ "v0" ] ],
-    [ "mpu1:VCC", "pico:3V3", "red", [ "v0" ] ],
-    [ "mpu1:GND", "pico:GND.6", "black", [ "v0" ] ],
-    [ "mpu1:SDA", "pico:GP20", "blue", [ "v0" ] ],
-    [ "mpu1:SCL", "pico:GP21", "gold", [ "v0" ] ],
-    [ "mpu1:AD0", "pico:GND.6", "black", [ "v0" ] ],
-    [ "bz1:2", "pico:GP15", "red", [ "v0" ] ],
-    [ "bz1:1", "pico:GND.4", "black", [ "v0" ] ],
-    [ "lcd1:GND", "pico:GND.5", "black", [ "v0" ] ],
-    [ "lcd1:VCC", "pico:VBUS", "red", [ "v0" ] ],
-    [ "lcd1:SDA", "pico:GP20", "blue", [ "v0" ] ],
-    [ "lcd1:SCL", "pico:GP21", "gold", [ "v0" ] ]
+    [
+      "temp1:DQ",
+      "pico:GP16",
+      "gold",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "mpu1:VCC",
+      "pico:3V3",
+      "red",
+      [
+        "h-9.6",
+        "v105.52"
+      ]
+    ],
+    [
+      "mpu1:SDA",
+      "pico:GP20",
+      "blue",
+      [
+        "h-19.2",
+        "v19.12"
+      ]
+    ],
+    [
+      "mpu1:SCL",
+      "pico:GP21",
+      "gold",
+      [
+        "h-28.8",
+        "v19.12"
+      ]
+    ],
+    [
+      "lcd1:VCC",
+      "pico:VBUS",
+      "red",
+      [
+        "h-9.6",
+        "v185.75"
+      ]
+    ],
+    [
+      "lcd1:SDA",
+      "pico:GP20",
+      "blue",
+      [
+        "h-28.8",
+        "v310.65"
+      ]
+    ],
+    [
+      "lcd1:SCL",
+      "pico:GP21",
+      "gold",
+      [
+        "h-19.2",
+        "v201.9"
+      ]
+    ],
+    [
+      "temp1:DQ",
+      "r1:1",
+      "gold",
+      [
+        "v9.6",
+        "h28.8",
+        "v-38.4"
+      ]
+    ],
+    [
+      "temp1:VCC",
+      "r1:2",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd1:GND",
+      "pico:GND.8",
+      "black",
+      [
+        "h-38.4",
+        "v220.8"
+      ]
+    ],
+    [
+      "temp1:VCC",
+      "pico:VBUS",
+      "red",
+      [
+        "v105.6",
+        "h-163.2",
+        "v-172.8"
+      ]
+    ],
+    [
+      "temp1:GND",
+      "pico:GND.8",
+      "black",
+      [
+        "h-28.8",
+        "v-48"
+      ]
+    ],
+    [
+      "bz1:1",
+      "pico:GND.8",
+      "black",
+      [
+        "v38.4"
+      ]
+    ],
+    [
+      "bz1:2",
+      "pico:GP28",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "mpu1:GND",
+      "pico:GND.8",
+      "black",
+      [
+        "h-48",
+        "v-76.88"
+      ]
+    ]
   ],
   "dependencies": {}
 }
