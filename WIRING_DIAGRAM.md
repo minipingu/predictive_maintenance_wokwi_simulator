@@ -45,8 +45,8 @@ Berdasarkan visual dashboard ThingsBoard pada Gambar 1, parameter telemetri dan 
 | | **GND & AD0** | **Hitam** | **Pin 28** | **GND** | Ground & Alamat I2C `0x68` |
 | | **SCL** | **Kuning / Emas** | **Pin 27** | **GP21** | Jalur I2C0 SCL |
 | | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur I2C0 SDA |
-| **Buzzer Alarm**<br>*(Wokwi: Pin 2=+, Pin 1=-)* | **Pin 2 / Positif (+)** (Kabel Merah) | **Merah** | **Pin 20** | **GP15** | Kontrol PWM Alarm frekuensi 2500 Hz |
-| | **Pin 1 / Negatif (-)** (Kabel Hitam) | **Hitam** | **Pin 18** | **GND** | Grounding Buzzer |
+| **Buzzer Alarm**<br>*(Wokwi: Pin 2=+, Pin 1=-)* | **Pin 2 / Positif (+)** (Kabel Merah) | **Merah** | **Pin 34** | **GP28** | Kontrol PWM Alarm frekuensi 2500 Hz |
+| | **Pin 1 / Negatif (-)** (Kabel Hitam) | **Hitam** | **Pin 38** | **GND** | Grounding Buzzer |
 | **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Merah** | **Pin 40** | **VBUS (5V)** | Catu daya modul I2C LCD & lampu latar backlight |
 | | **GND** | **Hitam** | **Pin 23** | **GND** | Grounding bersama (Pin 23 Pico GND.5) |
 | | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur I2C0 Data (Alamat default `0x27`) |

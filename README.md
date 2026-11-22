@@ -21,8 +21,8 @@ Proyek sistem pemantauan kesehatan bantalan bor (*drill bearing*) secara real-ti
 | | **GND & AD0** | **Hitam** | **Pin 28** | **GND** | Arde & menentukan alamat I2C default `0x68`. |
 | | **SCL** | **Kuning / Emas** | **Pin 27** | **GP21** | Jalur Clock I2C0. |
 | | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur Data I2C0. |
-| **Buzzer Alarm**<br>*(Piezo)* | **Pin 2 / Positif (+)** | **Merah** | **Pin 20** | **GP15** | Kontrol sinyal PWM alarm frekuensi 2500 Hz (Pin 2 Wokwi). |
-| | **Pin 1 / Negatif (-)** | **Hitam** | **Pin 18** | **GND** | Jalur arde buzzer (Pin 1 Wokwi). |
+| **Buzzer Alarm**<br>*(Piezo)* | **Pin 2 / Positif (+)** | **Merah** | **Pin 34** | **GP28** | Kontrol sinyal PWM alarm frekuensi 2500 Hz (Pin 2 Wokwi). |
+| | **Pin 1 / Negatif (-)** | **Hitam** | **Pin 38** | **GND** | Jalur arde buzzer (Pin 1 Wokwi). |
 | **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Merah** | **Pin 40** | **VBUS (5V)** | Daya 5V modul LCD & lampu latar backlight. |
 | | **GND** | **Hitam** | **Pin 23** | **GND** | Jalur arde bersama (Pin 23 Pico GND.5). |
 | | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur Data I2C0 SDA (Alamat default `0x27`). |
@@ -45,10 +45,10 @@ Proyek sistem pemantauan kesehatan bantalan bor (*drill bearing*) secara real-ti
 | | **SCL** | **Pin 5** | `GPIO 3 (I2C1 SCL)` | Jalur clock serial I2C bus 1. |
 | | **CS** | **Pin 17** | `3V3 Power` | Hubungkan ke 3.3V untuk mengaktifkan mode I2C. |
 | | **SDO** | **Pin 25** | `Ground` | Hubungkan ke GND untuk memilih alamat I2C `0x53`. |
-| **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 1** / **Pin 17** | `3V3 Power` | Gunakan **3.3V** agar pin GPIO RPi tidak rusak oleh overvoltage. |
+| **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 1** (3.3V) / **Pin 2** (5V) | `3V3 / 5V Power` | Mendukung rentang 3.0V–5.5V. Coba hubungkan ke **3.3V (Pin 1)** terlebih dahulu; **jika sensor tidak terbaca (folder `28-*` tidak muncul), pindahkan VCC ke 5V (Pin 2 / Pin 4)** karena probe waterproof berkabel panjang sering membutuhkan 5V akibat drop tegangan. |
 | | **GND** (Hitam) | **Pin 6** | `Ground` | Arde bersama. |
 | | **DQ** (Kuning) | **Pin 7** | `GPIO 4 (GPCLK0)` | Jalur data kernel Linux 1-Wire (`w1-gpio`). |
-| | **Pull-Up 4.7 kΩ** | Antara DQ & 3.3V | Resistor 4.7 kΩ | Jumper dari **Pin 7 (DQ)** ke **Pin 1 (3V3)**. |
+| | **Pull-Up 4.7 kΩ** | Antara DQ & 3.3V | Resistor 4.7 kΩ | Jumper dari **Pin 7 (DQ)** ke **Pin 1 (3.3V)**. *(Pull-up disarankan ke 3.3V agar level logika GPIO 4 tetap aman).* |
 | **Buzzer Aktif 5V** | **Positif (+)** | **Pin 12** | `GPIO 18 (PWM0)` | Kontrol trigger alarm via transistor/driver buzzer. |
 | | **Negatif (-)** | **Pin 14** | `Ground` | Arde buzzer. |
 | **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Pin 2** / **Pin 4** | `5V Power` | Catu daya 5V untuk modul LCD. |
@@ -230,6 +230,11 @@ Setelah reboot, verifikasi bahwa sensor terdeteksi oleh kernel:
    ```
    *Hasil:* Baris kedua menampilkan nilai `t=28125` (artinya suhu $28.125 \text{ }^\circ\text{C}$).
 
+   > 💡 **Troubleshooting Jika Folder `28-*` Tidak Terbaca:**
+   > - Jika saat `ls /sys/bus/w1/devices/` folder berawalan `28-` tidak muncul (hanya `w1_bus_master1`):
+   >   1. Pindahkan kabel **VCC DS18B20 (Merah)** dari **Pin 1 (3.3V)** ke **Pin 2 atau Pin 4 (5V)**. Kabel probe waterproof yang panjang sering mengalami *voltage drop* sehingga sensor tidak terbaca pada 3.3V.
+   >   2. Pastikan resistor pull-up **4.7 kΩ** tetap terhubung antara **DQ (Pin 7)** ke **Pin 1 (3.3V)** *(bukan ke 5V)* agar level logika GPIO 4 Raspberry Pi tetap aman pada 3.3V.
+
 ---
 
 ### Langkah 3: Menginstal Dependensi Python 3
@@ -356,7 +361,7 @@ Pada mesin bor duduk transmisi sabuk puli (*belt pulley*), kecepatan spindle sta
 
 Anda dapat menguji respon sistem (LCD, Buzzer, dan ThingsBoard) dengan menggeser slider komponen pada kanvas Wokwi:
 
-| Skenario Pengujian | Slider DS18B20 | Slider MPU-6050 | Tampilan Layar LCD 16x2 | Buzzer GP15 | Status ThingsBoard EU |
+| Skenario Pengujian | Slider DS18B20 | Slider MPU-6050 | Tampilan Layar LCD 16x2 | Buzzer GP28 | Status ThingsBoard EU |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **1. Kondisi Normal**<br>*(Operasional Aman)* | **$35.0^\circ\text{C}$**<br>*(Normal)* | **$(0, 0, 0)\text{ g}$**<br>*(RMS ~ $0.25\text{ g}$)* | Baris 1: `STATUS: NORMAL`<br>Baris 2: `T:35.0C R:0.25g` | **MATI (OFF)** | `status_alarm: "NORMAL"`<br>`alarm: false` |
 | **2. Kerusakan Getaran**<br>*(Spindle Unbalance)* | **$35.0^\circ\text{C}$**<br>*(Normal)* | **$X \ge 2.0\text{ g}$**<br>*(RMS $\ge 2.85\text{ g}$)* | Baris 1: `ALAT BERGETAR,`<br>Baris 2: `RUSAK!` | **BUNYI**<br>*(PWM 2500 Hz)* | `status_alarm: "ALARM"`<br>`alarm: true (HIGH_RMS)` |

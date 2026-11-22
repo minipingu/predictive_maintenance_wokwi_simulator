@@ -432,7 +432,7 @@
     <g transform="translate(325, 45)">
       <rect x="0" y="0" width="280" height="170" rx="6" fill="#141822" stroke="#283244"/>
       <text x="15" y="24" fill="#81c784" font-size="12" font-weight="bold">2. DS18B20 (Suhu Waterproof):</text>
-      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC (Merah)  ➔ <tspan fill="#ff5252" font-weight="bold">Pin 2</tspan> (5V Power)</text>
+      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC (Merah)  ➔ <tspan fill="#ff8a80" font-weight="bold">Pin 1 (3.3V)</tspan> / <tspan fill="#ff5252" font-weight="bold">Pin 2 (5V)</tspan></text>
       <text x="15" y="72" fill="#e0e0e0" font-size="11">• GND (Hitam)  ➔ <tspan fill="#81d4fa" font-weight="bold">Pin 6</tspan> (Ground)</text>
       <text x="15" y="96" fill="#e0e0e0" font-size="11">• DQ (Kuning)  ➔ <tspan fill="#69f0ae" font-weight="bold">Pin 7</tspan> (GPIO 4 1-Wire)</text>
       <text x="15" y="125" fill="#ffd54f" font-size="10.5" font-weight="bold">⚠️ Resistor Pull-Up 4.7 kΩ:</text>
