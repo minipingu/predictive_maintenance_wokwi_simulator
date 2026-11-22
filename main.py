@@ -33,7 +33,7 @@ RMS_ALARM_THRESHOLD  = 2.50 * G    # 24.52 m/s^2 (setara 2.50 g) - Indikasi keru
 PEAK_ALARM_THRESHOLD = 4.50 * G    # 44.13 m/s^2 (setara 4.50 g) - Indikasi kejutan impak spalling
 
 # Pinout Raspberry Pi Pico W
-PIN_BZ  = 15            # Buzzer PWM -> GP15
+PIN_BZ  = 28            # Buzzer PWM -> GP15
 PIN_DS  = 16            # DS18B20 DQ -> GP16
 PIN_SDA = 20            # I2C0 SDA   -> GP20
 PIN_SCL = 21            # I2C0 SCL   -> GP21
@@ -52,21 +52,15 @@ SIM_Y = (F_HARMONIC2, 1.0)  # Sumbu Y: getaran transmisi sabuk/pulley bor (50 Hz
 SIM_Z = (F_BEARING, 0.5)    # Sumbu Z: getaran aksial lintasan bola bearing (77.5 Hz)
 
 # ===================== DRIVER BUZZER ALARM =====================
-buzzer_pin = Pin(PIN_BZ, Pin.OUT)
-buzzer_pwm = None
+buzzer_pwm = PWM(Pin(PIN_BZ))
+buzzer_pwm.duty_u16(0)
 
 def set_buzzer(active=True):
-    global buzzer_pwm
     if active:
-        if buzzer_pwm is None:
-            buzzer_pwm = PWM(buzzer_pin)
         buzzer_pwm.freq(2500)
-        buzzer_pwm.duty_u16(32768)
+        buzzer_pwm.duty_u16(32768)  # 50% duty cycle, suara aktif
     else:
-        if buzzer_pwm is not None:
-            buzzer_pwm.duty_u16(0)
-            buzzer_pwm.deinit()
-            buzzer_pwm = None
+        buzzer_pwm.duty_u16(0)      # Senyap (duty 0%)
 
 # ===================== DRIVER LCD 16x2 I2C =====================
 class I2cLcd:
