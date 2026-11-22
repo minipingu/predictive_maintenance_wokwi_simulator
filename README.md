@@ -35,6 +35,8 @@ Proyek sistem pemantauan kesehatan bantalan bor (*drill bearing*) secara real-ti
 
 ### B. Tabel Wiring Perangkat Keras Fisik: Raspberry Pi 4 Model B
 
+![Diagram Wiring Raspberry Pi 4 Model B](WIRING_DIAGRAM_RPI4.svg)
+
 | Modul / Sensor | Pin Modul | Pin Fisik RPi 4 | Nama Pin BCM | Penjelasan Khusus RPi 4 |
 | :--- | :--- | :--- | :--- | :--- |
 | **ADXL345 (Getaran)** | **VCC** | **Pin 1** | `3V3 Power` | Catu daya logika 3.3V. |
