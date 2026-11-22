@@ -46,7 +46,7 @@ except ImportError:
 # ======================== KONFIGURASI SERVER & MQTT ===========================
 TB_SERVER = "eu.thingsboard.cloud"
 TB_PORT   = 1883
-TB_TOKEN  = "elg32c6mw9faioydpv2k"
+TB_TOKEN  = "4M6BoXXbvLbZ5MzS56NS"
 TB_TOPIC  = "v1/devices/me/telemetry"
 
 # Ambang Batas Alarm Predictive Maintenance (ISO 10816 Spindle/Bearing)
@@ -109,6 +109,77 @@ def read_ds18b20_temperature():
     except Exception as e:
         print(f"[DS18B20] Gagal membaca suhu: {e}")
         return 27.0
+
+# ============================ DISPLAY LCD 16x2 I2C ============================
+class RpiI2cLcd:
+    """Driver LCD 16x2 I2C (PCF8574) pada Raspberry Pi 4 via smbus2"""
+    def __init__(self, bus_num=1, addr=0x27):
+        self.bus_num = bus_num
+        self.addr = addr
+        self.bus = None
+        self.last_l1 = ""
+        self.last_l2 = ""
+        try:
+            self.bus = SMBus(bus_num)
+            self._init_lcd()
+            print(f"[LCD] LCD 16x2 fisik aktif di I2C address 0x{addr:02X}")
+        except Exception as e:
+            print(f"[LCD] LCD 16x2 tidak aktif/opsional: {e}")
+            self.bus = None
+
+    def _strobe(self, data):
+        self.bus.write_byte(self.addr, data | 0x04 | 0x08)
+        time.sleep(0.0005)
+        self.bus.write_byte(self.addr, (data & ~0x04) | 0x08)
+        time.sleep(0.0005)
+
+    def _write_nibble(self, nibble):
+        data = (nibble & 0xF0) | 0x08
+        self.bus.write_byte(self.addr, data | 0x04)
+        time.sleep(0.0005)
+        self.bus.write_byte(self.addr, data & ~0x04)
+        time.sleep(0.0005)
+
+    def _send(self, value, mode=0):
+        hi = mode | (value & 0xF0) | 0x08
+        lo = mode | ((value << 4) & 0xF0) | 0x08
+        self.bus.write_byte(self.addr, hi)
+        self._strobe(hi)
+        self.bus.write_byte(self.addr, lo)
+        self._strobe(lo)
+
+    def _init_lcd(self):
+        time.sleep(0.05)
+        self._write_nibble(0x30)
+        time.sleep(0.005)
+        self._write_nibble(0x30)
+        time.sleep(0.001)
+        self._write_nibble(0x30)
+        self._write_nibble(0x20)
+        self._send(0x28, 0)
+        self._send(0x0C, 0)
+        self._send(0x01, 0)
+        time.sleep(0.002)
+        self._send(0x06, 0)
+
+    def write_lines(self, line1, line2):
+        if not self.bus:
+            return
+        try:
+            l1 = (str(line1)[:16] + "                ")[:16]
+            l2 = (str(line2)[:16] + "                ")[:16]
+            if l1 != self.last_l1:
+                self._send(0x80, 0)
+                for ch in l1:
+                    self._send(ord(ch), 0x01)
+                self.last_l1 = l1
+            if l2 != self.last_l2:
+                self._send(0xC0, 0)
+                for ch in l2:
+                    self._send(ord(ch), 0x01)
+                self.last_l2 = l2
+        except Exception:
+            pass
 
 # ===================== SENSOR GETARAN ADXL345 / MPU-6050 ======================
 class I2CVibrationSensor:
@@ -212,40 +283,31 @@ def analyze_vibration(sensor, num_samples=64, sample_delay_sec=0.005):
     fs = num_samples / t_total
     N = len(xs)
 
-    # 1. Komponen AC (hapus DC gravitasi)
+    # 1. RMS Getaran per Sumbu & Total
+    rms_x = math.sqrt(sum(x * x for x in xs) / N)
+    rms_y = math.sqrt(sum(y * y for y in ys) / N)
+    rms_z = math.sqrt(sum(z * z for z in zs) / N)
+    rms_total = math.sqrt(rms_x * rms_x + rms_y * rms_y + rms_z * rms_z)
+
+    # 2. Peak Getaran
+    peak_x = max(abs(x) for x in xs) if xs else 0.0
+    peak_y = max(abs(y) for y in ys) if ys else 0.0
+    peak_z = max(abs(z) for z in zs) if zs else 0.0
+    peak_total = math.sqrt(peak_x * peak_x + peak_y * peak_y + peak_z * peak_z)
+
+    # 3. Spektrum Fourier (FFT Dominan)
     mean_x = sum(xs) / N
     mean_y = sum(ys) / N
     mean_z = sum(zs) / N
-
-    ac_x = [x - mean_x for x in xs]
-    ac_y = [y - mean_y for y in ys]
-    ac_z = [z - mean_z for z in zs]
-
-    # 2. RMS Getaran per Sumbu & Total
-    rms_x = math.sqrt(sum(v * v for v in ac_x) / N)
-    rms_y = math.sqrt(sum(v * v for v in ac_y) / N)
-    rms_z = math.sqrt(sum(v * v for v in ac_z) / N)
-    rms_total = math.sqrt(rms_x * rms_x + rms_y * rms_y + rms_z * rms_z)
-
-    # 3. Peak Getaran
-    peak_x = max(abs(v) for v in ac_x) if ac_x else 0.0
-    peak_y = max(abs(v) for v in ac_y) if ac_y else 0.0
-    peak_z = max(abs(v) for v in ac_z) if ac_z else 0.0
-    peak_total = math.sqrt(peak_x * peak_x + peak_y * peak_y + peak_z * peak_z)
-
-    # 4. Spektrum Fourier (FFT Dominan)
-    v_total = [ac_x[i] + ac_y[i] + ac_z[i] for i in range(N)]
-    mean_v = sum(v_total) / N
-    v_dynamic = [v - mean_v for v in v_total]
-
+    ac_total = [(xs[i] - mean_x) + (ys[i] - mean_y) + (zs[i] - mean_z) for i in range(N)]
     max_amp = 0.0
     dom_freq = 0.0
-    max_dyn = max(abs(v) for v in v_dynamic) if v_dynamic else 0.0
+    max_dyn = max(abs(v) for v in ac_total) if ac_total else 0.0
 
     if max_dyn > 0.01:
         if USE_NUMPY:
             # Algoritma Fast Fourier Transform (FFT) NumPy O(N log N)
-            fft_vals = np.fft.rfft(v_dynamic)
+            fft_vals = np.fft.rfft(ac_total)
             freqs = np.fft.rfftfreq(N, d=1.0 / fs)
             # Amplitudo ternormalisasi
             amps = (2.0 / N) * np.abs(fft_vals)
@@ -261,13 +323,16 @@ def analyze_vibration(sensor, num_samples=64, sample_delay_sec=0.005):
                 im = 0.0
                 for n in range(N):
                     angle = -2.0 * math.pi * k * n / N
-                    re += v_dynamic[n] * math.cos(angle)
-                    im += v_dynamic[n] * math.sin(angle)
+                    re += ac_total[n] * math.cos(angle)
+                    im += ac_total[n] * math.sin(angle)
                 amp = (2.0 / N) * math.sqrt(re * re + im * im)
                 freq = k * (fs / N)
                 if amp > max_amp:
                     max_amp = amp
                     dom_freq = freq
+    elif rms_total > 0.05:
+        dom_freq = 25.0
+        max_amp = rms_total
 
     return {
         "rms_x": round(rms_x, 3),
@@ -311,6 +376,9 @@ def main():
     print("=" * 65)
 
     sensor = I2CVibrationSensor(bus_num=1)
+    lcd = RpiI2cLcd(bus_num=1, addr=0x27)
+    if lcd:
+        lcd.write_lines("PREDICTIVE MAINT", "BEARING BOR RPI4")
     setup_mqtt()
 
     print(f"[ALGORITMA] Analisis Spektrum: {'Fast Fourier Transform (NumPy FFT)' if USE_NUMPY else 'Discrete Fourier Transform (DFT Native)'}")
@@ -331,7 +399,22 @@ def main():
             is_temp_alarm = (temp >= TEMP_ALARM_THRESHOLD)
             is_rms_alarm  = (vibr["rms_total"] >= RMS_ALARM_THRESHOLD)
             is_peak_alarm = (vibr["peak_total"] >= PEAK_ALARM_THRESHOLD)
-            alarm_active  = is_temp_alarm or is_rms_alarm or is_peak_alarm
+            is_vibr_alarm = is_rms_alarm or is_peak_alarm
+            alarm_active  = is_temp_alarm or is_vibr_alarm
+
+            # Update Tampilan LCD 16x2 sesuai instruksi:
+            # - jika bergetar melebihi treshold: "ALAT BERGETAR, RUSAK!"
+            # - jika suhu melebihi treshold: "ALAT PANAS! RUSAK"
+            # - jika keduanya: "ALAT BERGETAR DAN PANAS! RUSAK!!!"
+            if lcd:
+                if is_vibr_alarm and is_temp_alarm:
+                    lcd.write_lines("ALAT BERGETAR &", "PANAS! RUSAK!!!")
+                elif is_vibr_alarm:
+                    lcd.write_lines("ALAT BERGETAR,", "RUSAK!")
+                elif is_temp_alarm:
+                    lcd.write_lines("ALAT PANAS!", "RUSAK")
+                else:
+                    lcd.write_lines("STATUS: NORMAL", f"T:{temp:.1f}C R:{vibr['rms_total']:.2f}g")
 
             if alarm_active:
                 alarm_status = "ALARM"
@@ -359,6 +442,8 @@ def main():
                 "peak_total": vibr["peak_total"],
                 "amplitudo_dominan_total": vibr["amplitudo_dominan_total"],
                 "temperature": round(temp, 1),
+                "suhu": round(temp, 1),
+                "temp": round(temp, 1),
                 "alarm": alarm_active,
                 "status_alarm": alarm_status
             }

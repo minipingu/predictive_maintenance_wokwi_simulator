@@ -2,3 +2,4 @@
 version = 1
 firmware = "firmware.uf2"
 elf = ""
+rfc2217ServerPort = 4000

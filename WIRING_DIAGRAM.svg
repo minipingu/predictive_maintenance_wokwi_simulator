@@ -296,9 +296,9 @@
         <text x="212" y="212">GP28</text><text x="212" y="237" fill="#81d4fa">GND (Pin33)</text>
         <text x="212" y="262">GP27</text><text x="212" y="287">GP26</text>
         <text x="212" y="312">RUN</text><text x="212" y="337">GP22</text>
-        <text x="212" y="362" fill="#81d4fa">GND (Pin28)</text><text x="212" y="387">GP19</text>
-        <text x="212" y="412" fill="#ffd54f">GP21 SCL (Pin27)</text><text x="212" y="437" fill="#64b5f6">GP20 SDA (Pin26)</text>
-        <text x="212" y="462">GP18</text><text x="212" y="487" fill="#81d4fa">GND</text>
+        <text x="212" y="362" fill="#81d4fa">GND (Pin28)</text><text x="212" y="387" fill="#ffd54f">GP21 SCL (Pin27)</text>
+        <text x="212" y="412" fill="#64b5f6">GP20 SDA (Pin26)</text><text x="212" y="437">GP19</text>
+        <text x="212" y="462">GP18</text><text x="212" y="487" fill="#81d4fa">GND (Pin23)</text>
         <text x="212" y="512">GP17</text><text x="212" y="537" fill="#81c784">GP16 DQ (Pin21)</text>
       </g>
     </g>
@@ -324,8 +324,8 @@
     <!-- Pins at Bottom -->
     <circle cx="45" cy="155" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
     <circle cx="115" cy="155" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
-    <text x="45" y="175" fill="#ef5350" font-size="11" font-weight="bold" text-anchor="middle">Pin 1 (+)</text>
-    <text x="115" y="175" fill="#90a4ae" font-size="11" font-weight="bold" text-anchor="middle">Pin 2 (-)</text>
+    <text x="45" y="175" fill="#ef5350" font-size="11" font-weight="bold" text-anchor="middle">Pin 2 (+)</text>
+    <text x="115" y="175" fill="#90a4ae" font-size="11" font-weight="bold" text-anchor="middle">Pin 1 (-)</text>
   </g>
 
   <!-- ====================================================================== -->
@@ -333,11 +333,11 @@
   <!-- ====================================================================== -->
   <g id="wires" filter="url(#wireShadow)" stroke-linecap="round" stroke-linejoin="round">
 
-    <!-- WIRE 1: DS18B20 VCC -> Pico VBUS (Pin 40, Red 5V) -->
-    <!-- temp1:VCC = (209, 245) -> pico:VBUS = (708, 159) -->
-    <path d="M 209,245 L 209,275 L 430,275 L 430,70 L 708,70 L 708,159" fill="none" stroke="#e74c3c" stroke-width="4"/>
+    <!-- WIRE 1: DS18B20 VCC -> Pico 3V3 (Pin 36, Red 3.3V) -->
+    <!-- temp1:VCC = (209, 245) -> pico:3V3 = (708, 259) -->
+    <path d="M 209,245 L 209,275 L 430,275 L 430,259 L 708,259" fill="none" stroke="#e74c3c" stroke-width="4"/>
     <circle cx="209" cy="245" r="4" fill="#e74c3c"/>
-    <circle cx="708" cy="159" r="4" fill="#e74c3c"/>
+    <circle cx="708" cy="259" r="4" fill="#e74c3c"/>
 
     <!-- WIRE 2: DS18B20 GND -> Pico GND.8 (Pin 38, Black) -->
     <!-- temp1:GND = (141, 245) -> pico:GND.8 = (708, 209) -->
@@ -364,34 +364,34 @@
     <path d="M 121.5,642 L 121.5,700 L 465,700 L 465,259 L 708,259" fill="none" stroke="#e74c3c" stroke-width="4"/>
     <circle cx="121.5" cy="642" r="4" fill="#e74c3c"/>
 
-    <!-- WIRE 6 & 7: MPU6050 GND & AD0 -> Pico GND.6 (Pin 33, Black) -->
+    <!-- WIRE 6 & 7: MPU6050 GND & AD0 -> Pico GND.6 (Pin 28, Black) -->
     <!-- mpu:GND = (141.5, 642) & mpu:AD0 = (241.5, 642) -->
     <path d="M 141.5,642 L 141.5,715 L 241.5,715 L 241.5,642" fill="none" stroke="#2c3e50" stroke-width="4"/>
-    <path d="M 241.5,715 L 455,715 L 455,334 L 708,334" fill="none" stroke="#2c3e50" stroke-width="4"/>
+    <path d="M 241.5,715 L 455,715 L 455,459 L 708,459" fill="none" stroke="#2c3e50" stroke-width="4"/>
     <circle cx="141.5" cy="642" r="4" fill="#2c3e50"/>
     <circle cx="241.5" cy="642" r="4" fill="#2c3e50"/>
-    <circle cx="708" cy="334" r="4" fill="#2c3e50"/>
+    <circle cx="708" cy="459" r="4" fill="#2c3e50"/>
 
     <!-- WIRE 8: MPU6050 SDA -> Pico GP20 (Pin 26, Blue) -->
-    <!-- mpu:SDA = (181.5, 642) -> pico:GP20 = (708, 534) -->
-    <path d="M 181.5,642 L 181.5,675 L 440,675 L 440,534 L 708,534" fill="none" stroke="#3498db" stroke-width="4"/>
+    <!-- mpu:SDA = (181.5, 642) -> pico:GP20 = (708, 509) -->
+    <path d="M 181.5,642 L 181.5,675 L 440,675 L 440,509 L 708,509" fill="none" stroke="#3498db" stroke-width="4"/>
     <circle cx="181.5" cy="642" r="4" fill="#3498db"/>
-    <circle cx="708" cy="534" r="4" fill="#3498db"/>
+    <circle cx="708" cy="509" r="4" fill="#3498db"/>
 
     <!-- WIRE 9: MPU6050 SCL -> Pico GP21 (Pin 27, Gold/Yellow) -->
-    <!-- mpu:SCL = (161.5, 642) -> pico:GP21 = (708, 509) -->
-    <path d="M 161.5,642 L 161.5,660 L 425,660 L 425,509 L 708,509" fill="none" stroke="#f1c40f" stroke-width="4"/>
+    <!-- mpu:SCL = (161.5, 642) -> pico:GP21 = (708, 484) -->
+    <path d="M 161.5,642 L 161.5,660 L 425,660 L 425,484 L 708,484" fill="none" stroke="#f1c40f" stroke-width="4"/>
     <circle cx="161.5" cy="642" r="4" fill="#f1c40f"/>
-    <circle cx="708" cy="509" r="4" fill="#f1c40f"/>
+    <circle cx="708" cy="484" r="4" fill="#f1c40f"/>
 
-    <!-- WIRE 10: Buzzer Pin 1 (+) -> Pico GP15 (Pin 20, Red) -->
-    <!-- bz:1 = (975, 575) -> pico:GP15 = (492, 634) -->
+    <!-- WIRE 10: Buzzer Pin 2 (+) -> Pico GP15 (Pin 20, Red) -->
+    <!-- bz:2 = (975, 575) -> pico:GP15 = (492, 634) -->
     <path d="M 975,575 L 975,735 L 475,735 L 475,634 L 492,634" fill="none" stroke="#e74c3c" stroke-width="4"/>
     <circle cx="975" cy="575" r="4" fill="#e74c3c"/>
     <circle cx="492" cy="634" r="4" fill="#e74c3c"/>
 
-    <!-- WIRE 11: Buzzer Pin 2 (-) -> Pico GND.4 (Pin 18, Black) -->
-    <!-- bz:2 = (1045, 575) -> pico:GND.4 = (492, 584) -->
+    <!-- WIRE 11: Buzzer Pin 1 (-) -> Pico GND.4 (Pin 18, Black) -->
+    <!-- bz:1 = (1045, 575) -> pico:GND.4 = (492, 584) -->
     <path d="M 1045,575 L 1045,750 L 460,750 L 460,584 L 492,584" fill="none" stroke="#2c3e50" stroke-width="4"/>
     <circle cx="1045" cy="575" r="4" fill="#2c3e50"/>
     <circle cx="492" cy="584" r="4" fill="#2c3e50"/>

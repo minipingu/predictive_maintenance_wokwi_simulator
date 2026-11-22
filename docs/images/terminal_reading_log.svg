@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="termBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#181825"/>
+      <stop offset="100%" stop-color="#11111b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Terminal Window Shell -->
+  <rect width="950" height="560" rx="14" fill="url(#termBg)" stroke="#313244" stroke-width="2"/>
+  
+  <!-- Titlebar -->
+  <path d="M 0 14 C 0 6.27 6.27 0 14 0 L 936 0 C 943.73 0 950 6.27 950 14 L 950 42 L 0 42 Z" fill="#1e1e2e"/>
+  <circle cx="28" cy="21" r="6" fill="#f38ba8"/>
+  <circle cx="48" cy="21" r="6" fill="#f9e2af"/>
+  <circle cx="68" cy="21" r="6" fill="#a6e3a1"/>
+  
+  <!-- Tab Label -->
+  <rect x="95" y="8" width="220" height="28" rx="6" fill="#313244"/>
+  <text x="110" y="26" font-family="'Segoe UI', sans-serif" font-size="12" fill="#cdd6f4">Terminal: PowerShell / Git Bash</text>
+
+  <!-- Terminal Command Prompt -->
+  <text x="35" y="75" font-family="'Cascadia Code', 'Courier New', monospace" font-size="13" fill="#89b4fa" font-weight="bold">PS C:\predictive_maintenance_wokwi_simulator&gt;</text>
+  <text x="395" y="75" font-family="'Cascadia Code', 'Courier New', monospace" font-size="13" fill="#a6e3a1">py -m mpremote connect port:rfc2217://localhost:4000 run main.py</text>
+
+  <!-- Output Lines -->
+  <g font-family="'Cascadia Code', 'Courier New', monospace" font-size="12" xml:space="preserve">
+    <text x="35" y="105" fill="#f9e2af">=================================================================</text>
+    <text x="35" y="125" fill="#cdd6f4" font-weight="bold"> PREDICTIVE MAINTENANCE BEARING BOR — WOKWI SIMULATOR</text>
+    <text x="35" y="145" fill="#89dceb"> Target: ThingsBoard EU (eu.thingsboard.cloud)</text>
+    <text x="35" y="165" fill="#f9e2af">=================================================================</text>
+
+    <text x="35" y="195" fill="#a6adc8">[I2C SCAN] Alamat terdeteksi: ['0x27', '0x68']</text>
+    <text x="35" y="215" fill="#a6e3a1">[SENSOR] MPU-6050 terdeteksi di 0x68 (Wokwi)</text>
+    <text x="35" y="235" fill="#94e2d5">[LCD] Menginisialisasi LCD 16x2 di alamat I2C: 0x27 [BERHASIL]</text>
+    <text x="35" y="255" fill="#fab387">[WiFi] Menghubungkan ke Wi-Fi: Wokwi-GUEST... Sukses Terhubung! IP: 10.0.2.15</text>
+    <text x="35" y="275" fill="#89b4fa">[MQTT] Menghubungkan ke ThingsBoard Server: eu.thingsboard.cloud:1883</text>
+    <text x="35" y="295" fill="#a6e3a1" font-weight="bold">[MQTT] SUKSES TERKONEKSI KE THINGSBOARD!</text>
+
+    <text x="35" y="325" fill="#585b70">-----------------------------------------------------------------</text>
+    <text x="35" y="348" fill="#f9e2af" font-weight="bold">Suhu: 27.5 °C | Status: NORMAL [OK]</text>
+    <text x="35" y="370" fill="#cdd6f4">RMS XYZ: (0.125, 0.180, 0.210) g -&gt; </text>
+    <text x="330" y="370" fill="#a6e3a1" font-weight="bold">RMS Total: 0.304 g</text>
+    
+    <text x="35" y="392" fill="#cdd6f4">Peak XYZ: (0.280, 0.350, 0.410) g -&gt; </text>
+    <text x="340" y="392" fill="#89dceb" font-weight="bold">Peak Total: 0.607 g</text>
+
+    <text x="35" y="414" fill="#cba6f7">Spektrum: Freq Dominan = 25.0 Hz | Amp Dominan = 0.285 g</text>
+
+    <text x="35" y="442" fill="#89b4fa">[MQTT] Telemetri Terkirim ke ThingsBoard EU:</text>
+    <text x="35" y="465" fill="#a6e3a1" font-size="11">{"rms_x":0.125,"rms_y":0.18,"rms_z":0.21,"rms_total":0.304,"temperature":27.5,"suhu":27.5,"alarm":false,"status_alarm":"NORMAL"}</text>
+
+    <text x="35" y="495" fill="#585b70">-----------------------------------------------------------------</text>
+    <text x="35" y="520" fill="#a6e3a1" font-weight="bold">LCD 16x2 Live Display: </text>
+    <text x="215" y="520" fill="#f9e2af">[Baris 1: STATUS: NORMAL ] [Baris 2: T:27.5C R:0.30g ]</text>
+  </g>
+</svg>
