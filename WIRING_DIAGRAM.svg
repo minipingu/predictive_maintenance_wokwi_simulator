@@ -208,8 +208,8 @@
     <text x="120" y="160" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">BOOTSEL</text>
 
     <!-- Silkscreen Title -->
-    <text x="120" y="320" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">Raspberry Pi Pico W</text>
-    <text x="120" y="338" fill="#a5d6a7" font-size="11" text-anchor="middle">MicroPython 2026</text>
+    <text x="120" y="318" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">Raspberry Pi Pico W</text>
+    <text x="120" y="334" fill="#a5d6a7" font-size="9" text-anchor="middle">MicroPython 2026</text>
 
     <!-- ================= 40 PINS (LEFT & RIGHT) ================= -->
     <!-- LEFT SIDE: Pins 1 to 20 -->
@@ -254,7 +254,7 @@
         <text x="28" y="362" fill="#81d4fa">GND</text><text x="28" y="387">GP10</text>
         <text x="28" y="412">GP11</text><text x="28" y="437">GP12</text>
         <text x="28" y="462">GP13</text><text x="28" y="487" fill="#81d4fa">GND (Pin18)</text>
-        <text x="28" y="512">GP14</text><text x="28" y="537" fill="#ff8a80">GP15 (Buzzer)</text>
+        <text x="28" y="512">GP14</text><text x="28" y="537">GP15</text>
       </g>
     </g>
 
@@ -293,7 +293,7 @@
         <text x="212" y="62" fill="#ff5252">VBUS (Pin40, 5V)</text><text x="212" y="87">VSYS</text>
         <text x="212" y="112" fill="#81d4fa">GND (Pin38)</text><text x="212" y="137">3V3_EN</text>
         <text x="212" y="162" fill="#ff8a80">3V3 (Pin36)</text><text x="212" y="187">ADC_VREF</text>
-        <text x="212" y="212">GP28</text><text x="212" y="237" fill="#81d4fa">GND (Pin33)</text>
+        <text x="212" y="212" fill="#ff8a80">GP28 (Buzzer)</text><text x="212" y="237" fill="#81d4fa">GND (Pin33)</text>
         <text x="212" y="262">GP27</text><text x="212" y="287">GP26</text>
         <text x="212" y="312">RUN</text><text x="212" y="337">GP22</text>
         <text x="212" y="362" fill="#81d4fa">GND (Pin28)</text><text x="212" y="387" fill="#ffd54f">GP21 SCL (Pin27)</text>

@@ -183,21 +183,26 @@
     <text x="28" y="60" fill="#80d8ff" font-family="Courier New, monospace" font-size="11.5">STATUS: NORMAL</text>
     <text x="28" y="76" fill="#b3e5fc" font-family="Courier New, monospace" font-size="9.5">T:35.0C  R:0.25g</text>
 
-    <text x="155" y="100" fill="#cfd8dc" font-size="10.5" font-weight="bold" text-anchor="middle">LCD 16x2 I2C PCF8574 (0x27)</text>
+    <text x="155" y="96" fill="#90caf9" font-size="10" font-weight="bold" text-anchor="middle">LCD 16x2 I2C PCF8574 (0x27)</text>
 
-    <!-- Backpack 4 Pins -->
-    <g transform="translate(25, 110)">
-      <rect x="0" y="-12" width="98" height="42" rx="4" fill="#2e7d32" stroke="#1b5e20"/>
+    <!-- Backpack 4 Pins (X canvas: 950 + 25 = 975) -->
+    <!-- Pin 1 GND: X=990, Pin 2 VCC: X=1014, Pin 3 SDA: X=1038, Pin 4 SCL: X=1062, Y=214 -->
+    <g transform="translate(25, 108)">
+      <rect x="0" y="0" width="102" height="34" rx="4" fill="#1b5e20" stroke="#2e7d32" stroke-width="1.5"/>
       <!-- Text Labels above Pins -->
-      <text x="14" y="-1" fill="#cfd8dc" font-size="7.5" font-weight="bold" text-anchor="middle">GND</text>
-      <text x="38" y="-1" fill="#ff8a80" font-size="7.5" font-weight="bold" text-anchor="middle">VCC</text>
-      <text x="62" y="-1" fill="#90caf9" font-size="7.5" font-weight="bold" text-anchor="middle">SDA</text>
-      <text x="84" y="-1" fill="#ffe082" font-size="7.5" font-weight="bold" text-anchor="middle">SCL</text>
-      <!-- Gold Pins: Pin 1 GND (X=989), Pin 2 VCC (X=1013), Pin 3 SDA (X=1037), Pin 4 SCL (X=1059) -->
-      <circle cx="14" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
-      <circle cx="38" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
-      <circle cx="62" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
-      <circle cx="84" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
+      <text x="15" y="11" fill="#eceff1" font-size="7.5" font-weight="bold" text-anchor="middle">GND</text>
+      <text x="39" y="11" fill="#ff8a80" font-size="7.5" font-weight="bold" text-anchor="middle">VCC</text>
+      <text x="63" y="11" fill="#90caf9" font-size="7.5" font-weight="bold" text-anchor="middle">SDA</text>
+      <text x="87" y="11" fill="#ffe082" font-size="7.5" font-weight="bold" text-anchor="middle">SCL</text>
+      <!-- Solder Pads with Center Holes -->
+      <circle cx="15" cy="22" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="15" cy="22" r="2.5" fill="#14171f"/>
+      <circle cx="39" cy="22" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="39" cy="22" r="2.5" fill="#14171f"/>
+      <circle cx="63" cy="22" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="63" cy="22" r="2.5" fill="#14171f"/>
+      <circle cx="87" cy="22" r="5.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="87" cy="22" r="2.5" fill="#14171f"/>
     </g>
   </g>
 
@@ -383,13 +388,6 @@
       <text x="0" y="3" fill="#ffffff" font-size="7.5" font-weight="bold" text-anchor="middle">20</text>
     </g>
   </g>
-
-  <!-- ====================================================================== -->
-  <!-- PIN CALLOUT BADGES (CLEARLY SPACED & CENTERED ON PIN COLUMNS) -->
-  <!-- Col X canvas = 420 + 55 + col*22 = 475 + col*22 -->
-  <!-- Top row pins (Even) -> Badges at Y=310 (Height 16) -->
-  <!-- Bottom row pins (Odd) -> Badges at Y=408 (Height 16) -->
-  <!-- ====================================================================== -->
   <g id="callout-badges" font-size="7.5" font-weight="bold" text-anchor="middle">
     <!-- Pin 2 (X=475) -->
     <rect x="465" y="304" width="20" height="14" rx="2" fill="#d32f2f"/>
@@ -458,9 +456,9 @@
     <circle cx="255" cy="198" r="4" fill="#e53935"/>
     <circle cx="475" cy="354" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 2: LCD 1602 VCC (X=1013, Y=205) -> Pin 4 (X=497, Y=354) -->
-    <path d="M 1013,205 L 1013,235 L 497,235 L 497,354" fill="none" stroke="#e53935" stroke-width="3"/>
-    <circle cx="1013" cy="205" r="4" fill="#e53935"/>
+    <!-- WIRE 2: LCD 1602 VCC (X=1014, Y=214) -> Pin 4 (X=497, Y=354) -->
+    <path d="M 1014,214 L 1014,235 L 497,235 L 497,354" fill="none" stroke="#e53935" stroke-width="3"/>
+    <circle cx="1014" cy="214" r="3.5" fill="#e53935" stroke="#ffffff" stroke-width="1"/>
     <circle cx="497" cy="354" r="3.5" fill="#ffffff"/>
 
     <!-- ===== 1-WIRE DATA (GREEN #00e676) ===== -->
@@ -477,7 +475,7 @@
     <!-- Enters Pin 1 strictly from the left at Y=386 -->
     <path d="M 51,212 L 51,290 L 355,290 L 355,257" fill="none" stroke="#ff7043" stroke-width="3"/>
     <path d="M 355,290 L 400,290 L 400,386 L 475,386" fill="none" stroke="#ff7043" stroke-width="3"/>
-    <circle cx="51" cy="212" r="4" fill="#ff7043"/>
+    <circle cx="51" cy="212" r="3.5" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
     <circle cx="355" cy="257" r="3.5" fill="#ff7043"/>
     <circle cx="475" cy="386" r="3.5" fill="#ffffff"/>
 
@@ -485,18 +483,18 @@
     <!-- WIRE 6: ADXL345 SDA (X=171, Y=212) & LCD SDA (X=1037, Y=205) -> Pin 3 (X=497, Y=386) -->
     <!-- Enters Pin 3 from below (Y=445) -->
     <path d="M 171,212 L 171,310 L 380,310 L 380,445 L 497,445 L 497,386" fill="none" stroke="#2979ff" stroke-width="3"/>
-    <circle cx="171" cy="212" r="4" fill="#2979ff"/>
-    <path d="M 1037,205 L 1037,445 L 497,445" fill="none" stroke="#2979ff" stroke-width="3"/>
-    <circle cx="1037" cy="205" r="4" fill="#2979ff"/>
+    <circle cx="171" cy="212" r="3.5" fill="#2979ff" stroke="#ffffff" stroke-width="1"/>
+    <path d="M 1038,214 L 1038,445 L 497,445" fill="none" stroke="#2979ff" stroke-width="3"/>
+    <circle cx="1038" cy="214" r="3.5" fill="#2979ff" stroke="#ffffff" stroke-width="1"/>
     <circle cx="497" cy="386" r="3.5" fill="#ffffff"/>
 
     <!-- ===== I2C BUS: SCL (YELLOW #ffc107) ===== -->
     <!-- WIRE 7: ADXL345 SCL (X=191, Y=212) & LCD SCL (X=1059, Y=205) -> Pin 5 (X=519, Y=386) -->
     <!-- Enters Pin 5 from below (Y=455) -->
     <path d="M 191,212 L 191,320 L 370,320 L 370,455 L 519,455 L 519,386" fill="none" stroke="#ffc107" stroke-width="3"/>
-    <circle cx="191" cy="212" r="4" fill="#ffc107"/>
-    <path d="M 1059,205 L 1059,455 L 519,455" fill="none" stroke="#ffc107" stroke-width="3"/>
-    <circle cx="1059" cy="205" r="4" fill="#ffc107"/>
+    <circle cx="191" cy="212" r="3.5" fill="#ffc107" stroke="#ffffff" stroke-width="1"/>
+    <path d="M 1062,214 L 1062,455 L 519,455" fill="none" stroke="#ffc107" stroke-width="3"/>
+    <circle cx="1062" cy="214" r="3.5" fill="#ffc107" stroke="#ffffff" stroke-width="1"/>
     <circle cx="519" cy="386" r="3.5" fill="#ffffff"/>
 
     <!-- ===== BUZZER ALARM (CORAL #ff5252 & SLATE #90a4ae) ===== -->
@@ -517,19 +515,26 @@
     <circle cx="380" cy="198" r="4" fill="#90a4ae"/>
     <circle cx="519" cy="354" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 11: LCD 1602 GND (X=989, Y=205) -> Pin 20 (GND, X=673, Y=354) -->
-    <path d="M 989,205 L 989,265 L 673,265 L 673,354" fill="none" stroke="#90a4ae" stroke-width="3"/>
-    <circle cx="989" cy="205" r="4" fill="#90a4ae"/>
+    <!-- WIRE 11: LCD 1602 GND (X=990, Y=214) -> Pin 20 (GND, X=673, Y=354) -->
+    <path d="M 990,214 L 990,265 L 673,265 L 673,354" fill="none" stroke="#90a4ae" stroke-width="3"/>
+    <circle cx="990" cy="214" r="3.5" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
     <circle cx="673" cy="354" r="3.5" fill="#ffffff"/>
 
     <!-- WIRE 12: ADXL345 GND (X=71, Y=212) -> Pin 9 (GND, X=563, Y=386) -->
     <!-- Enters Pin 9 from below (Y=465) -->
     <path d="M 71,212 L 71,330 L 360,330 L 360,465 L 563,465 L 563,386" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
-    <circle cx="71" cy="212" r="4" fill="#90a4ae"/>
+    <circle cx="71" cy="212" r="3.5" fill="#90a4ae" stroke="#ffffff" stroke-width="1"/>
     <circle cx="563" cy="386" r="3.5" fill="#ffffff"/>
   </g>
 
   <!-- ====================================================================== -->
+  <!-- ====================================================================== -->
+  <!-- PIN CALLOUT BADGES (CLEARLY SPACED & CENTERED ON PIN COLUMNS) -->
+  <!-- Col X canvas = 420 + 55 + col*22 = 475 + col*22 -->
+  <!-- Top row pins (Even) -> Badges at Y=310 (Height 16) -->
+  <!-- Bottom row pins (Odd) -> Badges at Y=408 (Height 16) -->
+  <!-- ====================================================================== -->
+
   <!-- 7. PINOUT CHEAT SHEET TABLE (BOTTOM FULL-WIDTH CARD) -->
   <!-- ====================================================================== -->
   <g transform="translate(25, 675)" filter="url(#shadow)">
