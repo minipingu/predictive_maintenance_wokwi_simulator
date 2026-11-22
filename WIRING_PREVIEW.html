@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skema Wiring Detail & Dokumentasi - Predictive Maintenance Bearing Bor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #38bdf8;
+        }
+        .card {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+        th {
+            background-color: #0f172a;
+            color: #38bdf8;
+        }
+        tr:hover {
+            background-color: #273549;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-red { background-color: #ef4444; color: white; }
+        .badge-blue { background-color: #3b82f6; color: white; }
+        .badge-green { background-color: #10b981; color: white; }
+        .badge-yellow { background-color: #f59e0b; color: black; }
+        .badge-purple { background-color: #8b5cf6; color: white; }
+        .badge-dark { background-color: #475569; color: white; }
+        .svg-container {
+            width: 100%;
+            overflow-x: auto;
+            text-align: center;
+            background: #111827;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+        pre {
+            background-color: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #a5f3fc;
+            border: 1px solid #334155;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛠️ DIAGRAM WIRING DETAIL & SISTEM PREDICTIVE MAINTENANCE BEARING BOR</h1>
+    <p>Simulasi Wokwi (Raspberry Pi Pico W) & Implementasi Fisik (Raspberry Pi 4) terintegrasi dengan ThingsBoard Cloud EU (<code>eu.thingsboard.cloud</code>).</p>
+
+    <!-- Visual Diagram -->
+    <div class="card">
+        <h2>📐 Gambar Skematik Wiring Presisi Tinggi</h2>
+        <div class="svg-container">
+            <img src="WIRING_DIAGRAM.svg" alt="Wiring Diagram" style="width: 100%; max-width: 1100px;">
+        </div>
+    </div>
+
+    <!-- Pinout Table -->
+    <div class="card">
+        <h2>📋 Tabel Koneksi Pin-to-Pin Detail</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Komponen</th>
+                    <th>Pin Komponen</th>
+                    <th>Warna Kabel</th>
+                    <th>Pin Raspberry Pi Pico</th>
+                    <th>Nama Pin Pico</th>
+                    <th>Fungsi / Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3"><strong>DS18B20</strong><br>(Sensor Suhu Waterproof)</td>
+                    <td>VCC (Kabel Merah)</td>
+                    <td><span class="badge badge-red">Merah</span></td>
+                    <td>Pin 40</td>
+                    <td>VBUS (5V USB)</td>
+                    <td>Daya 5V sesuai instruksi waterproof probe</td>
+                </tr>
+                <tr>
+                    <td>GND (Kabel Hitam)</td>
+                    <td><span class="badge badge-dark">Hitam</span></td>
+                    <td>Pin 38</td>
+                    <td>GND</td>
+                    <td>Grounding common</td>
+                </tr>
+                <tr>
+                    <td>DQ (Kabel Kuning / Hijau)</td>
+                    <td><span class="badge badge-green">Hijau / Kuning</span></td>
+                    <td>Pin 21</td>
+                    <td>GP16</td>
+                    <td>Data OneWire (Pull-up 4.7k ke Pin 36 3.3V)</td>
+                </tr>
+                <tr>
+                    <td rowspan="4"><strong>MPU-6050</strong> (Wokwi)<br><em>/ ADXL345 (Real Hardware)</em></td>
+                    <td>VCC</td>
+                    <td><span class="badge badge-yellow">Oranye / Merah</span></td>
+                    <td>Pin 36</td>
+                    <td>3V3 (OUT)</td>
+                    <td>Daya logic 3.3V aman untuk I2C Pico</td>
+                </tr>
+                <tr>
+                    <td>GND & AD0</td>
+                    <td><span class="badge badge-dark">Hitam</span></td>
+                    <td>Pin 28</td>
+                    <td>GND</td>
+                    <td>Ground & alamat I2C default (0x68)</td>
+                </tr>
+                <tr>
+                    <td>SCL</td>
+                    <td><span class="badge badge-yellow">Kuning / Emas</span></td>
+                    <td>Pin 27</td>
+                    <td>GP21 (I2C0 SCL)</td>
+                    <td>Clock I2C</td>
+                </tr>
+                <tr>
+                    <td>SDA</td>
+                    <td><span class="badge badge-blue">Biru</span></td>
+                    <td>Pin 26</td>
+                    <td>GP20 (I2C0 SDA)</td>
+                    <td>Data I2C</td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><strong>Buzzer Alarm</strong><br>(Piezo Sounder)</td>
+                    <td>Positif (+) / Red Lead</td>
+                    <td><span class="badge badge-red">Merah</span></td>
+                    <td>Pin 20</td>
+                    <td>GP15 (PWM)</td>
+                    <td>Sinyal Alarm Frekuensi 2500 Hz</td>
+                </tr>
+                <tr>
+                    <td>Negatif (-) / Black Lead</td>
+                    <td><span class="badge badge-dark">Hitam</span></td>
+                    <td>Pin 18</td>
+                    <td>GND</td>
+                    <td>Ground Buzzer</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Thresholds and JSON telemetry -->
+    <div class="grid-2">
+        <div class="card">
+            <h2>⚠️ Logika & Ambang Batas Alarm (ISO 10816)</h2>
+            <ul>
+                <li><strong>Suhu Maksimum Normal:</strong> &le; 50.0 °C (Zona merah gauge Gambar 1)</li>
+                <li><strong>RMS Total Getaran Maksimum:</strong> &le; 2.50 g (Batas bahaya ISO 10816-3 Class 1/2)</li>
+                <li><strong>Peak Total Getaran Maksimum:</strong> &le; 4.50 g</li>
+                <li><strong>Kondisi Alarm Terpicu:</strong> Jika salah satu melebihi ambang batas:
+                    <ul>
+                        <li>Komponen Buzzer berbunyi (PWM 2500 Hz).</li>
+                        <li>Lampu Alarm di ThingsBoard menyala (<code>"alarm": true</code>).</li>
+                        <li>Status berubah dari <code>"NORMAL"</code> menjadi <code>"ALARM"</code>.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📡 Format Payload MQTT ThingsBoard</h2>
+            <pre>{
+  "rms_x": 0.125,
+  "rms_y": 0.180,
+  "rms_z": 0.210,
+  "rms_total": 0.304,
+  "frekuensi_dominan_total": 25.0,
+  "peak_x": 0.280,
+  "peak_y": 0.350,
+  "peak_z": 0.410,
+  "peak_total": 0.607,
+  "amplitudo_dominan_total": 0.285,
+  "temperature": 27.5,
+  "alarm": false,
+  "status_alarm": "NORMAL"
+}</pre>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

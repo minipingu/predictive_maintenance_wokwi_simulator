@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "author": "Antigravity",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-pi-pico-w",
+      "id": "pico",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "mpu1",
+      "top": 200,
+      "left": -200,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-ds18b20",
+      "id": "temp1",
+      "top": 60,
+      "left": -190,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 120,
+      "left": -90,
+      "attrs": {
+        "value": "4700"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 60,
+      "left": 160,
+      "attrs": {
+        "hasLocalSound": "true"
+      }
+    }
+  ],
+  "connections": [
+    [ "temp1:VCC", "pico:VBUS", "red", [ "v0" ] ],
+    [ "temp1:GND", "pico:GND.8", "black", [ "v0" ] ],
+    [ "temp1:DQ", "pico:GP16", "green", [ "v0" ] ],
+    [ "r1:1", "temp1:DQ", "green", [ "v0" ] ],
+    [ "r1:2", "pico:3V3", "red", [ "v0" ] ],
+    [ "mpu1:VCC", "pico:3V3", "red", [ "v0" ] ],
+    [ "mpu1:GND", "pico:GND.6", "black", [ "v0" ] ],
+    [ "mpu1:SDA", "pico:GP20", "blue", [ "v0" ] ],
+    [ "mpu1:SCL", "pico:GP21", "gold", [ "v0" ] ],
+    [ "mpu1:AD0", "pico:GND.6", "black", [ "v0" ] ],
+    [ "bz1:1", "pico:GP15", "red", [ "v0" ] ],
+    [ "bz1:2", "pico:GND.4", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
