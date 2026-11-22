@@ -187,15 +187,17 @@
 
     <!-- Backpack 4 Pins -->
     <g transform="translate(25, 110)">
-      <rect x="0" y="0" width="95" height="30" rx="3" fill="#2e7d32" stroke="#1b5e20"/>
-      <circle cx="14" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <circle cx="38" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <circle cx="62" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <circle cx="84" cy="15" r="4.5" fill="#ffd700" stroke="#b8860b"/>
-      <text x="14" y="38" fill="#90a4ae" font-size="8" font-weight="bold" text-anchor="middle">GND</text>
-      <text x="38" y="38" fill="#ff5252" font-size="8" font-weight="bold" text-anchor="middle">VCC</text>
-      <text x="62" y="38" fill="#2979ff" font-size="8" font-weight="bold" text-anchor="middle">SDA</text>
-      <text x="84" y="38" fill="#ffc107" font-size="8" font-weight="bold" text-anchor="middle">SCL</text>
+      <rect x="0" y="-12" width="98" height="42" rx="4" fill="#2e7d32" stroke="#1b5e20"/>
+      <!-- Text Labels above Pins -->
+      <text x="14" y="-1" fill="#cfd8dc" font-size="7.5" font-weight="bold" text-anchor="middle">GND</text>
+      <text x="38" y="-1" fill="#ff8a80" font-size="7.5" font-weight="bold" text-anchor="middle">VCC</text>
+      <text x="62" y="-1" fill="#90caf9" font-size="7.5" font-weight="bold" text-anchor="middle">SDA</text>
+      <text x="84" y="-1" fill="#ffe082" font-size="7.5" font-weight="bold" text-anchor="middle">SCL</text>
+      <!-- Gold Pins: Pin 1 GND (X=989), Pin 2 VCC (X=1013), Pin 3 SDA (X=1037), Pin 4 SCL (X=1059) -->
+      <circle cx="14" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
+      <circle cx="38" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
+      <circle cx="62" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
+      <circle cx="84" cy="15" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.2"/>
     </g>
   </g>
 
@@ -474,9 +476,9 @@
     <circle cx="255" cy="198" r="4" fill="#e53935"/>
     <circle cx="475" cy="354" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 2: LCD 1602 VCC (X=988, Y=225) -> Pin 4 (X=497, Y=354) -->
-    <path d="M 988,225 L 988,235 L 497,235 L 497,354" fill="none" stroke="#e53935" stroke-width="3"/>
-    <circle cx="988" cy="225" r="4" fill="#e53935"/>
+    <!-- WIRE 2: LCD 1602 VCC (X=1013, Y=205) -> Pin 4 (X=497, Y=354) -->
+    <path d="M 1013,205 L 1013,235 L 497,235 L 497,354" fill="none" stroke="#e53935" stroke-width="3"/>
+    <circle cx="1013" cy="205" r="4" fill="#e53935"/>
     <circle cx="497" cy="354" r="3.5" fill="#ffffff"/>
 
     <!-- ===== 1-WIRE DATA (GREEN #00e676) ===== -->
@@ -489,36 +491,36 @@
     <circle cx="541" cy="386" r="3.5" fill="#ffffff"/>
 
     <!-- ===== 3.3V POWER (ORANGE #ff7043) ===== -->
-    <!-- WIRE 4: ADXL345 VCC (X=43, Y=212) -> Resistor Lead 2 (X=355, Y=257) -> Pin 1 (X=475, Y=386) -->
+    <!-- WIRE 4: ADXL345 VCC (X=51, Y=212) -> Resistor Lead 2 (X=355, Y=257) -> Pin 1 (X=475, Y=386) -->
     <!-- Enters Pin 1 strictly from the left at Y=386 -->
-    <path d="M 43,212 L 43,290 L 355,290 L 355,257" fill="none" stroke="#ff7043" stroke-width="3"/>
+    <path d="M 51,212 L 51,290 L 355,290 L 355,257" fill="none" stroke="#ff7043" stroke-width="3"/>
     <path d="M 355,290 L 400,290 L 400,386 L 475,386" fill="none" stroke="#ff7043" stroke-width="3"/>
-    <circle cx="43" cy="212" r="4" fill="#ff7043"/>
+    <circle cx="51" cy="212" r="4" fill="#ff7043"/>
     <circle cx="355" cy="257" r="3.5" fill="#ff7043"/>
     <circle cx="475" cy="386" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 5: ADXL345 CS (X=83, Y=212) -> Pin 17 (X=651, Y=386) [I2C Mode] -->
+    <!-- WIRE 5: ADXL345 CS (X=91, Y=212) -> Pin 17 (X=651, Y=386) [I2C Mode] -->
     <!-- Routes around bottom, enters Pin 17 from below (Y=435) -->
-    <path d="M 83,212 L 83,300 L 390,300 L 390,435 L 651,435 L 651,386" fill="none" stroke="#ff8a80" stroke-width="2.5"/>
-    <circle cx="83" cy="212" r="4" fill="#ff8a80"/>
+    <path d="M 91,212 L 91,300 L 390,300 L 390,435 L 651,435 L 651,386" fill="none" stroke="#ff8a80" stroke-width="2.5"/>
+    <circle cx="91" cy="212" r="4" fill="#ff8a80"/>
     <circle cx="651" cy="386" r="3.5" fill="#ffffff"/>
 
     <!-- ===== I2C BUS: SDA (BLUE #2979ff) ===== -->
-    <!-- WIRE 6: ADXL345 SDA (X=163, Y=212) & LCD SDA (X=1012, Y=225) -> Pin 3 (X=497, Y=386) -->
+    <!-- WIRE 6: ADXL345 SDA (X=171, Y=212) & LCD SDA (X=1037, Y=205) -> Pin 3 (X=497, Y=386) -->
     <!-- Enters Pin 3 from below (Y=445) -->
-    <path d="M 163,212 L 163,310 L 380,310 L 380,445 L 497,445 L 497,386" fill="none" stroke="#2979ff" stroke-width="3"/>
-    <circle cx="163" cy="212" r="4" fill="#2979ff"/>
-    <path d="M 1012,225 L 1012,445 L 497,445" fill="none" stroke="#2979ff" stroke-width="3"/>
-    <circle cx="1012" cy="225" r="4" fill="#2979ff"/>
+    <path d="M 171,212 L 171,310 L 380,310 L 380,445 L 497,445 L 497,386" fill="none" stroke="#2979ff" stroke-width="3"/>
+    <circle cx="171" cy="212" r="4" fill="#2979ff"/>
+    <path d="M 1037,205 L 1037,445 L 497,445" fill="none" stroke="#2979ff" stroke-width="3"/>
+    <circle cx="1037" cy="205" r="4" fill="#2979ff"/>
     <circle cx="497" cy="386" r="3.5" fill="#ffffff"/>
 
     <!-- ===== I2C BUS: SCL (YELLOW #ffc107) ===== -->
-    <!-- WIRE 7: ADXL345 SCL (X=183, Y=212) & LCD SCL (X=1034, Y=225) -> Pin 5 (X=519, Y=386) -->
+    <!-- WIRE 7: ADXL345 SCL (X=191, Y=212) & LCD SCL (X=1059, Y=205) -> Pin 5 (X=519, Y=386) -->
     <!-- Enters Pin 5 from below (Y=455) -->
-    <path d="M 183,212 L 183,320 L 370,320 L 370,455 L 519,455 L 519,386" fill="none" stroke="#ffc107" stroke-width="3"/>
-    <circle cx="183" cy="212" r="4" fill="#ffc107"/>
-    <path d="M 1034,225 L 1034,455 L 519,455" fill="none" stroke="#ffc107" stroke-width="3"/>
-    <circle cx="1034" cy="225" r="4" fill="#ffc107"/>
+    <path d="M 191,212 L 191,320 L 370,320 L 370,455 L 519,455 L 519,386" fill="none" stroke="#ffc107" stroke-width="3"/>
+    <circle cx="191" cy="212" r="4" fill="#ffc107"/>
+    <path d="M 1059,205 L 1059,455 L 519,455" fill="none" stroke="#ffc107" stroke-width="3"/>
+    <circle cx="1059" cy="205" r="4" fill="#ffc107"/>
     <circle cx="519" cy="386" r="3.5" fill="#ffffff"/>
 
     <!-- ===== BUZZER ALARM (CORAL #ff5252 & SLATE #90a4ae) ===== -->
@@ -539,21 +541,21 @@
     <circle cx="380" cy="198" r="4" fill="#90a4ae"/>
     <circle cx="519" cy="354" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 11: LCD 1602 GND (X=964, Y=225) -> Pin 20 (GND, X=673, Y=354) -->
-    <path d="M 964,225 L 964,265 L 673,265 L 673,354" fill="none" stroke="#90a4ae" stroke-width="3"/>
-    <circle cx="964" cy="225" r="4" fill="#90a4ae"/>
+    <!-- WIRE 11: LCD 1602 GND (X=989, Y=205) -> Pin 20 (GND, X=673, Y=354) -->
+    <path d="M 989,205 L 989,265 L 673,265 L 673,354" fill="none" stroke="#90a4ae" stroke-width="3"/>
+    <circle cx="989" cy="205" r="4" fill="#90a4ae"/>
     <circle cx="673" cy="354" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 12: ADXL345 GND (X=63, Y=212) -> Pin 9 (GND, X=563, Y=386) -->
+    <!-- WIRE 12: ADXL345 GND (X=71, Y=212) -> Pin 9 (GND, X=563, Y=386) -->
     <!-- Enters Pin 9 from below (Y=465) -->
-    <path d="M 63,212 L 63,330 L 360,330 L 360,465 L 563,465 L 563,386" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
-    <circle cx="63" cy="212" r="4" fill="#90a4ae"/>
+    <path d="M 71,212 L 71,330 L 360,330 L 360,465 L 563,465 L 563,386" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
+    <circle cx="71" cy="212" r="4" fill="#90a4ae"/>
     <circle cx="563" cy="386" r="3.5" fill="#ffffff"/>
 
-    <!-- WIRE 13: ADXL345 SDO (X=143, Y=212) -> Pin 25 (GND, X=739, Y=386) [Sets Addr 0x53] -->
+    <!-- WIRE 13: ADXL345 SDO (X=151, Y=212) -> Pin 25 (GND, X=739, Y=386) [Sets Addr 0x53] -->
     <!-- Enters Pin 25 from below (Y=475) -->
-    <path d="M 143,212 L 143,340 L 350,340 L 350,475 L 739,475 L 739,386" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
-    <circle cx="143" cy="212" r="4" fill="#90a4ae"/>
+    <path d="M 151,212 L 151,340 L 350,340 L 350,475 L 739,475 L 739,386" fill="none" stroke="#90a4ae" stroke-width="2.5"/>
+    <circle cx="151" cy="212" r="4" fill="#90a4ae"/>
     <circle cx="739" cy="386" r="3.5" fill="#ffffff"/>
   </g>
 
