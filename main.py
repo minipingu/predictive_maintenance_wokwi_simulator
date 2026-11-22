@@ -33,7 +33,7 @@ RMS_ALARM_THRESHOLD  = 2.50 * G    # 24.52 m/s^2 (setara 2.50 g) - Indikasi keru
 PEAK_ALARM_THRESHOLD = 4.50 * G    # 44.13 m/s^2 (setara 4.50 g) - Indikasi kejutan impak spalling
 
 # Pinout Raspberry Pi Pico W
-PIN_BZ  = 28            # Buzzer PWM -> GP15
+PIN_BZ  = 28            # Buzzer PWM -> GP28
 PIN_DS  = 16            # DS18B20 DQ -> GP16
 PIN_SDA = 20            # I2C0 SDA   -> GP20
 PIN_SCL = 21            # I2C0 SCL   -> GP21
@@ -386,24 +386,29 @@ while True:
     is_vibr_alarm = (rms_total >= RMS_ALARM_THRESHOLD) or (peak_total >= PEAK_ALARM_THRESHOLD)
     alarm_active  = is_temp_alarm or is_vibr_alarm
 
+    # Evaluasi Pesan Status Berdasarkan Ambang Batas (Threshold)
+    if is_vibr_alarm and is_temp_alarm:
+        status_str = "ALAT BERGETAR & PANAS! RUSAK!!!"
+        line1_lcd, line2_lcd = "ALAT BERGETAR &", "PANAS! RUSAK!!!"
+    elif is_vibr_alarm:
+        status_str = "ALAT BERGETAR, RUSAK!"
+        line1_lcd, line2_lcd = "ALAT BERGETAR,", "RUSAK!"
+    elif is_temp_alarm:
+        status_str = "ALAT PANAS! RUSAK"
+        line1_lcd, line2_lcd = "ALAT PANAS!", "RUSAK"
+    else:
+        status_str = "NORMAL"
+        line1_lcd, line2_lcd = "STATUS: NORMAL", "T:{:.1f}C R:{:.2f}g".format(suhu, rms_total / G)
+
     # Kontrol Tampilan Layar LCD 16x2
     if lcd:
-        if is_vibr_alarm and is_temp_alarm:
-            lcd.write_lines("ALAT BERGETAR &", "PANAS! RUSAK!!!")
-        elif is_vibr_alarm:
-            lcd.write_lines("ALAT BERGETAR,", "RUSAK!")
-        elif is_temp_alarm:
-            lcd.write_lines("ALAT PANAS!", "RUSAK")
-        else:
-            lcd.write_lines("STATUS: NORMAL", "T:{:.1f}C R:{:.2f}g".format(suhu, rms_total / G))
+        lcd.write_lines(line1_lcd, line2_lcd)
 
-    # Kontrol Buzzer Alarm (GP15)
+    # Kontrol Buzzer Alarm
     if alarm_active:
         set_buzzer(True)
-        status_str = "ALARM"
     else:
         set_buzzer(False)
-        status_str = "NORMAL"
 
     print("===== Pengukuran #%d [%s] =====" % (no, status_str))
     print("Suhu DS18B20 : %.2f °C (Alarm jika >= %.1f)" % (suhu, TEMP_ALARM_THRESHOLD))
@@ -426,7 +431,9 @@ while True:
         "freq_dom": round(r[8], 2), "frekuensi_dominan_total": round(r[8], 2),
         "amp_dom": round(r[9], 3),  "amplitudo_dominan_total": round(r[9], 3),
         "alarm": alarm_active,
-        "status_alarm": status_str
+        "status_alarm": status_str,
+        "pesan_status": status_str,
+        "status": status_str
     }
     kirim_tb(data)
     print()

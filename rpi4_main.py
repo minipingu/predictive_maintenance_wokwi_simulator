@@ -402,32 +402,33 @@ def main():
             is_vibr_alarm = is_rms_alarm or is_peak_alarm
             alarm_active  = is_temp_alarm or is_vibr_alarm
 
-            # Update Tampilan LCD 16x2 sesuai instruksi:
-            # - jika bergetar melebihi treshold: "ALAT BERGETAR, RUSAK!"
-            # - jika suhu melebihi treshold: "ALAT PANAS! RUSAK"
-            # - jika keduanya: "ALAT BERGETAR DAN PANAS! RUSAK!!!"
-            if lcd:
-                if is_vibr_alarm and is_temp_alarm:
-                    lcd.write_lines("ALAT BERGETAR &", "PANAS! RUSAK!!!")
-                elif is_vibr_alarm:
-                    lcd.write_lines("ALAT BERGETAR,", "RUSAK!")
-                elif is_temp_alarm:
-                    lcd.write_lines("ALAT PANAS!", "RUSAK")
-                else:
-                    lcd.write_lines("STATUS: NORMAL", f"T:{temp:.1f}C R:{vibr['rms_total']:.2f}g")
-
-            if alarm_active:
-                alarm_status = "ALARM"
-                set_buzzer(True)
-                reasons = []
-                if is_temp_alarm: reasons.append("OVERHEAT")
-                if is_rms_alarm:  reasons.append("HIGH_RMS")
-                if is_peak_alarm: reasons.append("HIGH_PEAK")
-                alarm_detail = " - ".join(reasons)
+            # Evaluasi Pesan Status Berdasarkan Ambang Batas (Threshold)
+            if is_vibr_alarm and is_temp_alarm:
+                alarm_status = "ALAT BERGETAR & PANAS! RUSAK!!!"
+                line1_lcd, line2_lcd = "ALAT BERGETAR &", "PANAS! RUSAK!!!"
+                alarm_detail = "OVERHEAT - HIGH_VIBR"
+            elif is_vibr_alarm:
+                alarm_status = "ALAT BERGETAR, RUSAK!"
+                line1_lcd, line2_lcd = "ALAT BERGETAR,", "RUSAK!"
+                alarm_detail = "HIGH_VIBR"
+            elif is_temp_alarm:
+                alarm_status = "ALAT PANAS! RUSAK"
+                line1_lcd, line2_lcd = "ALAT PANAS!", "RUSAK"
+                alarm_detail = "OVERHEAT"
             else:
                 alarm_status = "NORMAL"
-                set_buzzer(False)
+                line1_lcd, line2_lcd = "STATUS: NORMAL", f"T:{temp:.1f}C R:{vibr['rms_total']:.2f}g"
                 alarm_detail = "OK"
+
+            # Update Tampilan LCD 16x2
+            if lcd:
+                lcd.write_lines(line1_lcd, line2_lcd)
+
+            # Kontrol Buzzer Alarm
+            if alarm_active:
+                set_buzzer(True)
+            else:
+                set_buzzer(False)
 
             # 4. Format Payload Telemetri (Sesuai Format ThingsBoard)
             payload = {
@@ -445,7 +446,9 @@ def main():
                 "suhu": round(temp, 1),
                 "temp": round(temp, 1),
                 "alarm": alarm_active,
-                "status_alarm": alarm_status
+                "status_alarm": alarm_status,
+                "pesan_status": alarm_status,
+                "status": alarm_status
             }
             payload_json = json.dumps(payload)
 
