@@ -17,10 +17,10 @@ Proyek sistem pemantauan kesehatan bantalan bor (*drill bearing*) secara real-ti
 | | **DQ** (Kabel Hijau/Kuning) | **Hijau** | **Pin 21** | **GP16** | Jalur data bus OneWire. |
 | **Resistor 4.7 kΩ**<br>*(Pull-up OneWire)* | Pin 1 | Hijau | Pin 21 | GP16 | Terhubung ke pin data `DQ` DS18B20. |
 | | Pin 2 | Merah / Oranye | Pin 36 | 3V3 (OUT) | Menarik level tegangan default ke 3.3V saat jalur idle. |
-| **MPU-6050** *(Wokwi)*<br>*(Emulasi ADXL345)* | **VCC** | **Merah** | **Pin 36** | **3V3 (OUT)** | Catu daya logika I2C 3.3V. |
-| | **GND & AD0** | **Hitam** | **Pin 28** | **GND** | Arde & menentukan alamat I2C default `0x68`. |
+| **MPU-6050** *(Wokwi)*<br>*(Emulasi ADXL345 - 4 Kabel)* | **VCC** | **Merah** | **Pin 36** | **3V3 (OUT)** | Catu daya logika I2C 3.3V. |
+| | **GND** | **Hitam** | **Pin 28** | **GND** | Jalur arde bersama (*Common Ground*). |
 | | **SCL** | **Kuning / Emas** | **Pin 27** | **GP21** | Jalur Clock I2C0. |
-| | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur Data I2C0. |
+| | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur Data I2C0. *(Pin AD0 tidak perlu kabel/NC karena sudah ada pull-down default 0x68).* |
 | **Buzzer Alarm**<br>*(Piezo)* | **Pin 2 / Positif (+)** | **Merah** | **Pin 34** | **GP28** | Kontrol sinyal PWM alarm frekuensi 2500 Hz (Pin 2 Wokwi). |
 | | **Pin 1 / Negatif (-)** | **Hitam** | **Pin 38** | **GND** | Jalur arde buzzer (Pin 1 Wokwi). |
 | **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Merah** | **Pin 40** | **VBUS (5V)** | Daya 5V modul LCD & lampu latar backlight. |

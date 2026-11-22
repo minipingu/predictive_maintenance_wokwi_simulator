@@ -41,10 +41,10 @@ Berdasarkan visual dashboard ThingsBoard pada Gambar 1, parameter telemetri dan 
 | | **DQ** (Kuning/Hijau) | **Hijau / Kuning**| **Pin 21** | **GP16** | Pin data OneWire |
 | **Resistor 4.7kΩ** | Pin 1 | Hijau | Pin 21 | GP16 | Terhubung ke DQ DS18B20 |
 | | Pin 2 | Oranye | Pin 36 | 3V3 (OUT) | Pull-up ke 3.3V agar level logika GP16 aman |
-| **MPU-6050** *(Wokwi)*<br>*(Emulasi ADXL345)* | **VCC** | **Oranye / Merah**| **Pin 36** | **3V3 (OUT)** | Tegangan logika 3.3V |
-| | **GND & AD0** | **Hitam** | **Pin 28** | **GND** | Ground & Alamat I2C `0x68` |
+| **MPU-6050** *(Wokwi)*<br>*(Emulasi ADXL345 - 4 Kabel)* | **VCC** | **Oranye / Merah**| **Pin 36** | **3V3 (OUT)** | Tegangan logika 3.3V |
+| | **GND** | **Hitam** | **Pin 28** | **GND** | Grounding bersama |
 | | **SCL** | **Kuning / Emas** | **Pin 27** | **GP21** | Jalur I2C0 SCL |
-| | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur I2C0 SDA |
+| | **SDA** | **Biru** | **Pin 26** | **GP20** | Jalur I2C0 SDA *(Pin AD0 NC / tidak perlu kabel)* |
 | **Buzzer Alarm**<br>*(Wokwi: Pin 2=+, Pin 1=-)* | **Pin 2 / Positif (+)** (Kabel Merah) | **Merah** | **Pin 34** | **GP28** | Kontrol PWM Alarm frekuensi 2500 Hz |
 | | **Pin 1 / Negatif (-)** (Kabel Hitam) | **Hitam** | **Pin 38** | **GND** | Grounding Buzzer |
 | **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Merah** | **Pin 40** | **VBUS (5V)** | Catu daya modul I2C LCD & lampu latar backlight |
