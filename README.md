@@ -44,10 +44,10 @@ Proyek sistem pemantauan kesehatan bantalan bor (*drill bearing*) secara real-ti
 | | **SDA** | **Pin 3** | `GPIO 2 (I2C1 SDA)` | Jalur data serial I2C bus 1. |
 | | **SCL** | **Pin 5** | `GPIO 3 (I2C1 SCL)` | Jalur clock serial I2C bus 1. |
 | | **CS & SDO** | *NC / Dibiarkan Lepas* | *Tidak Perlu Kabel* | Pada modul GY-291, pin CS sudah memiliki pull-up internal (mode I2C aktif) dan SDO sudah memiliki pull-down internal (alamat I2C otomatis `0x53`). |
-| **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 1** (3.3V) / **Pin 2** (5V) | `3V3 / 5V Power` | Mendukung rentang 3.0V–5.5V. Coba hubungkan ke **3.3V (Pin 1)** terlebih dahulu; **jika sensor tidak terbaca (folder `28-*` tidak muncul), pindahkan VCC ke 5V (Pin 2 / Pin 4)** karena probe waterproof berkabel panjang sering membutuhkan 5V akibat drop tegangan. |
-| | **GND** (Hitam) | **Pin 6** | `Ground` | Arde bersama. |
+| **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 2** (5V) | `5V Power` | Catu daya 5V untuk keandalan pembacaan probe waterproof berkabel panjang (menghindari drop tegangan). |
+| | **GND** (Hitam) | **Pin 6** | `Ground` | Arde bersama (*Common Ground*). |
 | | **DQ** (Kuning) | **Pin 7** | `GPIO 4 (GPCLK0)` | Jalur data kernel Linux 1-Wire (`w1-gpio`). |
-| | **Pull-Up 4.7 kΩ** | Antara DQ & 3.3V | Resistor 4.7 kΩ | Jumper dari **Pin 7 (DQ)** ke **Pin 1 (3.3V)**. *(Pull-up disarankan ke 3.3V agar level logika GPIO 4 tetap aman).* |
+| | **Pull-Up 4.7 kΩ** | Antara VCC (5V) & DQ | Resistor 4.7 kΩ | Jumper resistor 4.7 kΩ langsung antara **VCC (5V)** dan **DQ** pada Terminal Block sensor. |
 | **Buzzer Aktif 5V** | **Positif (+)** | **Pin 12** | `GPIO 18 (PWM0)` | Kontrol trigger alarm via transistor/driver buzzer. |
 | | **Negatif (-)** | **Pin 14** | `Ground` | Arde buzzer. |
 | **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Pin 2** / **Pin 4** | `5V Power` | Catu daya 5V untuk modul LCD. |

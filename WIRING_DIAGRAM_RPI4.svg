@@ -137,7 +137,7 @@
       <circle cx="0" cy="30" r="5" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
       <text x="0" y="0" fill="#ff5252" font-size="9" font-weight="bold" text-anchor="middle">VCC</text>
       <text x="0" y="11" fill="#b0bec5" font-size="7.5" text-anchor="middle">(Merah)</text>
-      <text x="0" y="47" fill="#ff8a80" font-size="7.5" text-anchor="middle">3.3V/5V</text>
+      <text x="0" y="47" fill="#ff5252" font-size="7.5" font-weight="bold" text-anchor="middle">5V</text>
     </g>
 
     <!-- Terminal 2: DQ (Kuning) at X=92 -->
@@ -157,24 +157,26 @@
     </g>
   </g>
 
-  <!-- 4.7k Resistor between DQ and 3.3V (Pull-Up Khusus DS18B20, Bukan ADXL) -->
-  <g id="mod-pullup-resistor" transform="translate(317, 255)" filter="url(#shadow)">
-    <!-- Left Lead connecting to DQ Data Line (X=0 to X=25) -->
-    <line x1="0" y1="10" x2="25" y2="10" stroke="#00e676" stroke-width="2.5"/>
-    <!-- Right Lead connecting to 3.3V Pin 1 (X=85 to X=105) -->
-    <line x1="85" y1="10" x2="105" y2="10" stroke="#ff7043" stroke-width="2.5"/>
+  <!-- 4.7k Resistor between VCC 5V and DQ (Jumper Langsung di Terminal Block) -->
+  <!-- Left lead connects to VCC 5V (X=255), Right lead connects to DQ (X=317) at Y=248 -->
+  <g id="mod-pullup-resistor" transform="translate(255, 238)" filter="url(#shadow)">
+    <!-- Left Lead from VCC 5V Line (X=0 to X=12) -->
+    <line x1="0" y1="10" x2="12" y2="10" stroke="#e53935" stroke-width="2.5"/>
+    <!-- Right Lead to DQ Line (X=50 to X=62) -->
+    <line x1="50" y1="10" x2="62" y2="10" stroke="#00e676" stroke-width="2.5"/>
     <!-- Resistor Body (Tan Ceramic) -->
-    <rect x="25" y="0" width="60" height="20" rx="6" fill="url(#resistorBody)" stroke="#8d6e63" stroke-width="1.5"/>
+    <rect x="12" y="1" width="38" height="18" rx="5" fill="url(#resistorBody)" stroke="#8d6e63" stroke-width="1.2"/>
     <!-- Color Bands: 4.7 kΩ (Yellow=4, Violet=7, Red=x100, Gold=5%) -->
-    <rect x="36" y="0" width="5" height="20" fill="#f1c40f"/>
-    <rect x="46" y="0" width="5" height="20" fill="#8e44ad"/>
-    <rect x="56" y="0" width="5" height="20" fill="#e74c3c"/>
-    <rect x="70" y="0" width="4" height="20" fill="#ffd700"/>
-    <!-- Lead Junction Terminals -->
-    <circle cx="0" cy="10" r="3.5" fill="#00e676" stroke="#ffffff" stroke-width="1"/>
-    <circle cx="105" cy="10" r="3.5" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
-    <text x="55" y="-6" fill="#ffd54f" font-size="9" font-weight="bold" text-anchor="middle">Pull-Up 4.7 kΩ</text>
-    <text x="55" y="31" fill="#b0bec5" font-size="7.5" text-anchor="middle">(DQ ke Pin 1 3.3V)</text>
+    <rect x="18" y="1" width="3.5" height="18" fill="#f1c40f"/>
+    <rect x="24" y="1" width="3.5" height="18" fill="#8e44ad"/>
+    <rect x="30" y="1" width="3.5" height="18" fill="#e74c3c"/>
+    <rect x="41" y="1" width="3" height="18" fill="#ffd700"/>
+    <!-- Lead Terminal Solder Dots -->
+    <circle cx="0" cy="10" r="3.5" fill="#e53935" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="62" cy="10" r="3.5" fill="#00e676" stroke="#ffffff" stroke-width="1"/>
+    <!-- Labels -->
+    <text x="31" y="-5" fill="#ffd54f" font-size="8.5" font-weight="bold" text-anchor="middle">Pull-Up 4.7 kΩ</text>
+    <text x="31" y="28" fill="#ff8a80" font-size="7.5" font-weight="bold" text-anchor="middle">(VCC 5V ➔ DQ)</text>
   </g>
 
   <!-- ====================================================================== -->
@@ -455,9 +457,11 @@
   <g id="wires" filter="url(#wireShadow)" stroke-linecap="round" stroke-linejoin="round">
 
     <!-- ===== 5V POWER (RED #e53935) ===== -->
-    <!-- WIRE 1: DS18B20 Terminal VCC (X=255, Y=198) -> Pin 2 (X=475, Y=354) -->
-    <path d="M 255,198 L 255,220 L 475,220 L 475,354" fill="none" stroke="#e53935" stroke-width="3"/>
+    <!-- WIRE 1: DS18B20 Terminal VCC (X=255, Y=198) -> Pin 2 (5V, X=475, Y=354) + Lead Resistor (X=255, Y=248) -->
+    <path d="M 255,198 L 255,248" fill="none" stroke="#e53935" stroke-width="3"/>
+    <path d="M 255,220 L 475,220 L 475,354" fill="none" stroke="#e53935" stroke-width="3"/>
     <circle cx="255" cy="198" r="4" fill="#e53935" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="255" cy="248" r="3.5" fill="#e53935"/>
     <circle cx="475" cy="354" r="3.5" fill="#ffffff"/>
 
     <!-- WIRE 2: LCD 1602 VCC (X=1014, Y=214) -> Pin 4 (X=497, Y=354) -->
@@ -466,22 +470,18 @@
     <circle cx="497" cy="354" r="3.5" fill="#ffffff"/>
 
     <!-- ===== 1-WIRE DATA (GREEN #00e676) ===== -->
-    <!-- WIRE 3: DS18B20 DQ (X=317, Y=198) -> Pin 7 (GPIO 4 / 1-Wire, X=541, Y=386) -->
+    <!-- WIRE 3: DS18B20 DQ (X=317, Y=198) -> Pin 7 (GPIO 4 / 1-Wire, X=541, Y=386) + Lead Resistor (X=317, Y=248) -->
     <!-- Enters Pin 7 strictly from below (Y=425) so it never touches top-row pins -->
     <path d="M 317,198 L 317,295 L 410,295 L 410,425 L 541,425 L 541,386" fill="none" stroke="#00e676" stroke-width="3"/>
     <circle cx="317" cy="198" r="4" fill="#00e676" stroke="#ffffff" stroke-width="1"/>
-    <circle cx="317" cy="265" r="3.5" fill="#00e676"/>
+    <circle cx="317" cy="248" r="3.5" fill="#00e676"/>
     <circle cx="541" cy="386" r="3.5" fill="#ffffff"/>
 
-    <!-- ===== 3.3V POWER & PULL-UP (ORANGE #ff7043) ===== -->
-    <!-- WIRE 4A: ADXL345 VCC (X=51, Y=212) -> Pin 1 (X=475, Y=386) (TERPISAH & LANGSUNG KE PIN 1) -->
-    <path d="M 51,212 L 51,315 L 420,315 L 420,386 L 475,386" fill="none" stroke="#ff7043" stroke-width="3"/>
+    <!-- ===== 3.3V POWER (ORANGE #ff7043) ===== -->
+    <!-- WIRE 4: ADXL345 VCC (X=51, Y=212) -> Pin 1 (3.3V Power, X=475, Y=386) -->
+    <path d="M 51,212 L 51,315 L 400,315 L 400,386 L 475,386" fill="none" stroke="#ff7043" stroke-width="3"/>
     <circle cx="51" cy="212" r="3.5" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
     <circle cx="475" cy="386" r="3.5" fill="#ffffff"/>
-
-    <!-- WIRE 4B: Resistor Lead 2 Pull-Up (X=422, Y=265) -> Pin 1 3.3V (X=475, Y=386) -->
-    <path d="M 422,265 L 440,265 L 440,386 L 475,386" fill="none" stroke="#ff7043" stroke-width="2.5"/>
-    <circle cx="422" cy="265" r="3.5" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
 
     <!-- ===== I2C BUS: SDA (BLUE #2979ff) ===== -->
     <!-- WIRE 6: ADXL345 SDA (X=171, Y=212) & LCD SDA (X=1037, Y=205) -> Pin 3 (X=497, Y=386) -->
@@ -563,12 +563,12 @@
     <g transform="translate(330, 45)">
       <rect x="0" y="0" width="285" height="170" rx="6" fill="#141822" stroke="#283244"/>
       <text x="15" y="24" fill="#81c784" font-size="12" font-weight="bold">2. DS18B20 (Suhu Waterproof):</text>
-      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC (Merah)  ➔ <tspan fill="#ff5252" font-weight="bold">Pin 2 (5V)</tspan> / <tspan fill="#ff7043" font-weight="bold">Pin 1 (3.3V)</tspan></text>
+      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC (Merah)  ➔ <tspan fill="#ff5252" font-weight="bold">Pin 2 (5V Power)</tspan></text>
       <text x="15" y="72" fill="#e0e0e0" font-size="11">• GND (Hitam)  ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 6</tspan> (Ground)</text>
       <text x="15" y="96" fill="#e0e0e0" font-size="11">• DQ (Kuning)  ➔ <tspan fill="#00e676" font-weight="bold">Pin 7</tspan> (GPIO 4 1-Wire)</text>
       <text x="15" y="125" fill="#ffd54f" font-size="10.5" font-weight="bold">⚠️ Resistor Pull-Up 4.7 kΩ:</text>
-      <text x="15" y="145" fill="#e0e0e0" font-size="10.5">Pasang antara <tspan fill="#00e676" font-weight="bold">Pin 7 (DQ)</tspan> ke <tspan fill="#ff7043" font-weight="bold">Pin 1 (3.3V)</tspan></text>
-      <text x="15" y="159" fill="#90a4ae" font-size="9.5">*(Tarik ke 3.3V agar level GPIO 4 tetap aman)*</text>
+      <text x="15" y="145" fill="#e0e0e0" font-size="10.5">Pasang antara <tspan fill="#ff5252" font-weight="bold">VCC (5V)</tspan> &amp; <tspan fill="#00e676" font-weight="bold">DQ (Pin 7)</tspan></text>
+      <text x="15" y="159" fill="#90a4ae" font-size="9.5">*(Jumper langsung di Terminal Block sensor)*</text>
     </g>
 
     <!-- Column 3: LCD 1602 I2C -->
