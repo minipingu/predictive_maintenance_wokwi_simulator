@@ -39,8 +39,8 @@ PIN_SDA = 20            # I2C0 SDA   -> GP20
 PIN_SCL = 21            # I2C0 SCL   -> GP21
 
 # WiFi & ThingsBoard EU
-WIFI_SSID = "Wokwi-GUEST"
-WIFI_PASS = ""
+WIFI_SSID = "iot_bbpvp"
+WIFI_PASS = "Guntur01!"
 TB_HOST   = "eu.thingsboard.cloud"
 TB_PORT   = 1883
 TB_TOKEN  = "4M6BoXXbvLbZ5MzS56NS"  # Token aktif ThingsBoard EU

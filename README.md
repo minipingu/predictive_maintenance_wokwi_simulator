@@ -205,8 +205,39 @@ Sistem pemantauan ini dapat dijalankan langsung pada mikrokontroler fisik **Rasp
 4. Seret (*drag-and-drop*) berkas [firmware.uf2](firmware.uf2) yang telah tersedia di direktori proyek ini ke dalam drive **`RPI-RP2`**.
 5. Board Pico akan otomatis melakukan *reboot* dan siap menjalankan MicroPython.
 
-### Langkah 2: Menyiapkan Thonny IDE (Software Editor)
-1. Unduh dan pasang aplikasi **Thonny IDE** dari situs resmi [thonny.org](https://thonny.org/) (tersedia untuk Windows, macOS, dan Linux).
+### Langkah 2: Menyiapkan Editor (VS Code atau Thonny IDE)
+
+Anda dapat menggunakan **Visual Studio Code (VS Code)** sebagai lingkungan pengembangan utama atau **Thonny IDE**:
+
+#### Opsi A: Menjalankan Langsung dari Visual Studio Code (Paling Praktis)
+1. **Pasang Ekstensi MicroPico di VS Code:**
+   * Buka tab **Extensions** di VS Code (`Ctrl + Shift + X`).
+   * Cari ekstensi: **`MicroPico`** (ID: `paulober.micropico`, sebelumnya bernama *Pico-W-Go*) lalu klik **Install**.
+2. **Koneksi Otomatis ke Raspberry Pi Pico:**
+   * Colokkan Pico yang sudah di-flash MicroPython ke port USB PC.
+   * VS Code akan otomatis mendeteksi board. Perhatikan status bar bawah layar VS Code; status akan berubah menjadi **`MicroPico: Connected`**.
+3. **Menjalankan Kode Seketika di Pico (Run / Test):**
+   * Buka berkas yang ingin diuji, misalnya [calibrate_adxl.py](calibrate_adxl.py) atau [main.py](main.py).
+   * Klik tombol **`Run`** di status bar bawah VS Code (atau klik kanan di dalam editor $\rightarrow$ pilih **`MicroPico: Run current file`**, atau shortcut **`Ctrl + Alt + R`**).
+   * Program akan langsung dieksekusi di prosesor Pico dan output log terminal REPL langsung tampil di tab Terminal VS Code!
+4. **Mengunggah File ke Flash Internal Pico (Autostart 24/7):**
+   * Klik tombol **`Upload`** di status bar bawah VS Code (atau tekan `Ctrl + Shift + P` $\rightarrow$ ketik `MicroPico: Upload project to Pico`).
+   * Semua file kode (`main.py`, `calibrate_adxl.py`, dll.) akan tersimpan permanen di memori flash Pico.
+   * Begitu kabel USB dicabut dan dicolokkan ke adaptor daya 5V mesin bor, Pico akan otomatis menjalankan `main.py` secara mandiri tanpa PC!
+
+> **💡 Opsi Alternatif di Terminal VS Code (CLI `mpremote`):**
+> Jika Anda lebih menyukai baris perintah CLI, pasang tool resmi MicroPython:
+> ```bash
+> py -m pip install mpremote
+> ```
+> * **Jalankan Skrip Seketika:** `py -m mpremote run calibrate_adxl.py`
+> * **Unggah Berkas ke Flash Pico:** `py -m mpremote fs cp main.py :main.py`
+> * **Buka Terminal Interaktif REPL:** `py -m mpremote repl` *(tekan `Ctrl + ]` untuk keluar)*
+
+---
+
+#### Opsi B: Menggunakan Thonny IDE (Alternatif GUI Sederhana)
+1. Unduh dan pasang aplikasi **Thonny IDE** dari situs resmi [thonny.org](https://thonny.org/).
 2. Buka Thonny IDE.
 3. Di pojok kanan bawah jendela Thonny, klik pilihan interpreter lalu pilih **`MicroPython (Raspberry Pi Pico)`**.
 4. Periksa jendela **Shell** di bagian bawah Thonny. Jika muncul teks prompt interaktif `>>> `, berarti Pico telah terhubung dengan sempurna.

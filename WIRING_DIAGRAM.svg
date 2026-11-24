@@ -305,6 +305,39 @@
   </g>
 
   <!-- ====================================================================== -->
+    <!-- ====================================================================== -->
+  <!-- 4. COMPONENT: LCD 1602 I2C DISPLAY (Top Right) -->
+  <!-- ====================================================================== -->
+  <g id="comp-lcd1602" transform="translate(860, 95)" filter="url(#wokwiShadow)">
+    <rect x="0" y="0" width="290" height="145" rx="6" fill="#1b1b1b" stroke="#333" stroke-width="2"/>
+    <rect x="16" y="14" width="258" height="64" rx="3" fill="#0d47a1" stroke="#1565c0" stroke-width="1.5"/>
+    <text x="26" y="38" fill="#ffffff" font-family="Courier New, monospace" font-size="12" font-weight="bold">PREDICTIVE MAINT</text>
+    <text x="26" y="55" fill="#80d8ff" font-family="Courier New, monospace" font-size="11">STATUS: NORMAL</text>
+    <text x="26" y="70" fill="#b3e5fc" font-family="Courier New, monospace" font-size="9">T:35.0C  R:0.25g</text>
+
+    <text x="145" y="93" fill="#cfd8dc" font-size="10" font-weight="bold" text-anchor="middle">LCD 16x2 I2C (PCF8574 0x27)</text>
+
+    <!-- Backpack 4 Pins (Canvas X: 860 + 20 = 880) -->
+    <!-- Pin 1 GND: X=894, Pin 2 VCC: X=918, Pin 3 SDA: X=942, Pin 4 SCL: X=966, Y=223 -->
+    <g transform="translate(20, 104)">
+      <rect x="0" y="0" width="100" height="32" rx="4" fill="#1b5e20" stroke="#2e7d32" stroke-width="1.5"/>
+      <!-- Labels -->
+      <text x="14" y="10" fill="#eceff1" font-size="7.5" font-weight="bold" text-anchor="middle">GND</text>
+      <text x="38" y="10" fill="#ff8a80" font-size="7.5" font-weight="bold" text-anchor="middle">VCC</text>
+      <text x="62" y="10" fill="#90caf9" font-size="7.5" font-weight="bold" text-anchor="middle">SDA</text>
+      <text x="86" y="10" fill="#ffe082" font-size="7.5" font-weight="bold" text-anchor="middle">SCL</text>
+      <!-- Gold Pins with Solder Dots -->
+      <circle cx="14" cy="20" r="4.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="14" cy="20" r="2" fill="#1e1e24"/>
+      <circle cx="38" cy="20" r="4.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="38" cy="20" r="2" fill="#1e1e24"/>
+      <circle cx="62" cy="20" r="4.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="62" cy="20" r="2" fill="#1e1e24"/>
+      <circle cx="86" cy="20" r="4.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>
+      <circle cx="86" cy="20" r="2" fill="#1e1e24"/>
+    </g>
+  </g>
+
   <!-- 5. COMPONENT: PIEZO BUZZER (Authentic Cylinder with + Marking) -->
   <!-- ====================================================================== -->
   <g id="comp-buzzer" transform="translate(930, 420)" filter="url(#wokwiShadow)">
@@ -381,6 +414,29 @@
     <path d="M 161.5,642 L 161.5,660 L 425,660 L 425,484 L 708,484" fill="none" stroke="#f1c40f" stroke-width="4"/>
     <circle cx="161.5" cy="642" r="4" fill="#f1c40f"/>
     <circle cx="708" cy="484" r="4" fill="#f1c40f"/>
+
+    
+    <!-- ===== LCD 1602 I2C CONNECTIONS ===== -->
+    <!-- WIRE 11: LCD VCC -> Pico VBUS (Pin 40, 5V, Red) -->
+    <!-- lcd:VCC = (918, 219) -> pico:VBUS = (708, 159) -->
+    <path d="M 918,219 L 918,255 L 760,255 L 760,159 L 708,159" fill="none" stroke="#e74c3c" stroke-width="3.5"/>
+    <circle cx="918" cy="219" r="3.5" fill="#e74c3c" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="708" cy="159" r="4" fill="#e74c3c"/>
+
+    <!-- WIRE 12: LCD GND -> Pico GND.8 (Pin 38, Black) -->
+    <!-- lcd:GND = (894, 219) -> pico:GND.8 = (708, 209) -->
+    <path d="M 894,219 L 894,245 L 770,245 L 770,209 L 708,209" fill="none" stroke="#2c3e50" stroke-width="3.5"/>
+    <circle cx="894" cy="219" r="3.5" fill="#2c3e50" stroke="#ffffff" stroke-width="1"/>
+
+    <!-- WIRE 13: LCD SCL -> Pico GP21 SCL (Pin 27, Gold/Yellow) -->
+    <!-- lcd:SCL = (966, 219) -> pico:GP21 = (708, 484) -->
+    <path d="M 966,219 L 966,350 L 820,350 L 820,484 L 708,484" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
+    <circle cx="966" cy="219" r="3.5" fill="#f1c40f" stroke="#ffffff" stroke-width="1"/>
+
+    <!-- WIRE 14: LCD SDA -> Pico GP20 SDA (Pin 26, Blue) -->
+    <!-- lcd:SDA = (942, 219) -> pico:GP20 = (708, 509) -->
+    <path d="M 942,219 L 942,365 L 805,365 L 805,509 L 708,509" fill="none" stroke="#3498db" stroke-width="3.5"/>
+    <circle cx="942" cy="219" r="3.5" fill="#3498db" stroke="#ffffff" stroke-width="1"/>
 
     <!-- WIRE 9: Buzzer Pin 2 (+) -> Pico GP28 (Pin 34, Red) -->
     <!-- bz:2 = (975, 575) -> pico:GP28 = (708, 309) -->
