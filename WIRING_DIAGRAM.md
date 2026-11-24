@@ -71,6 +71,8 @@ Sensor fisik asli Anda adalah **ADXL345**, sedangkan di Wokwi hanya tersedia **M
 > - SDA -> Pin 26 (GP20 Pico) / Pin 3 (GPIO 2 RPi 4)
 > - SCL -> Pin 27 (GP21 Pico) / Pin 5 (GPIO 3 RPi 4)
 > - *CS & SDO: Pada breakout board GY-291 ADXL345, pin CS dan SDO sudah memiliki pull-up/pull-down resistor internal di PCB sehingga tidak perlu disambung kabel (NC).*
+>
+> 💡 **Kalibrasi & Pengujian XYZ Real-Time:** Gunakan skrip mandiri [calibrate_adxl.py](calibrate_adxl.py) di Thonny IDE untuk menguji komunikasi I2C, mengkalibrasi offset saat sensor diam di permukaan datar, dan memantau pembacaan live sumbu X, Y, Z secara grafis. Hasil kalibrasi otomatis tersimpan ke `calib_adxl.json`.
 
 ---
 

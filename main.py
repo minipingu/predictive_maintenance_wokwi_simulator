@@ -150,11 +150,26 @@ else:  # MPU6050
     SKALA = (4.0 * G) / 32768.0
     REG, FMT = 0x3B, '>hhh'
 
+# Offset kalibrasi sensor getaran (dimuat otomatis dari calib_adxl.json jika ada)
+OFFSET_X, OFFSET_Y, OFFSET_Z = 0.0, 0.0, 0.0
+try:
+    with open("calib_adxl.json", "r") as _f:
+        _cal = json.load(_f)
+        OFFSET_X = _cal.get("offset_x_ms2", 0.0)
+        OFFSET_Y = _cal.get("offset_y_ms2", 0.0)
+        OFFSET_Z = _cal.get("offset_z_ms2", 0.0)
+        print(f"[CALIB] Offset kalibrasi ADXL345 aktif: X={OFFSET_X:+.3f}, Y={OFFSET_Y:+.3f}, Z={OFFSET_Z:+.3f} m/s^2")
+except Exception:
+    pass
+
 def baca_xyz():
     try:
         d = i2c.readfrom_mem(ADDR, REG, 6)
         x, y, z = struct.unpack(FMT, d)
-        return x * SKALA, y * SKALA, z * SKALA
+        ax = (x * SKALA) - OFFSET_X
+        ay = (y * SKALA) - OFFSET_Y
+        az = (z * SKALA) - OFFSET_Z
+        return ax, ay, az
     except Exception:
         return 0.0, 0.0, 1.0 * G
 

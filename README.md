@@ -192,7 +192,124 @@ Pastikan komponen lingkungan pengembangan berikut siap:
 
 ---
 
-## 🍓 3. Panduan Detail Menjalankan di Raspberry Pi 4 (Hardware Fisik)
+---
+
+## 📟 3. Panduan Detail Menjalankan di Raspberry Pi Pico / Pico W (Hardware Fisik)
+
+Sistem pemantauan ini dapat dijalankan langsung pada mikrokontroler fisik **Raspberry Pi Pico W** (dengan koneksi nirkabel WiFi/MQTT) maupun **Raspberry Pi Pico Standar** (monitoring lokal LCD & Buzzer) menggunakan MicroPython.
+
+### Langkah 1: Flashing Firmware MicroPython ke Pico / Pico W
+1. Pastikan Raspberry Pi Pico belum terhubung ke komputer.
+2. Tekan dan tahan tombol putih **BOOTSEL** pada board Pico, lalu colokkan kabel Micro-USB ke port USB PC/Laptop.
+3. Lepaskan tombol BOOTSEL. Di komputer Anda akan muncul drive USB penyimpanan massal bernama **`RPI-RP2`**.
+4. Seret (*drag-and-drop*) berkas [firmware.uf2](firmware.uf2) yang telah tersedia di direktori proyek ini ke dalam drive **`RPI-RP2`**.
+5. Board Pico akan otomatis melakukan *reboot* dan siap menjalankan MicroPython.
+
+### Langkah 2: Menyiapkan Thonny IDE (Software Editor)
+1. Unduh dan pasang aplikasi **Thonny IDE** dari situs resmi [thonny.org](https://thonny.org/) (tersedia untuk Windows, macOS, dan Linux).
+2. Buka Thonny IDE.
+3. Di pojok kanan bawah jendela Thonny, klik pilihan interpreter lalu pilih **`MicroPython (Raspberry Pi Pico)`**.
+4. Periksa jendela **Shell** di bagian bawah Thonny. Jika muncul teks prompt interaktif `>>> `, berarti Pico telah terhubung dengan sempurna.
+
+### Langkah 3: Skema Wiring Fisik Sensor ke Raspberry Pi Pico
+Hubungkan modul sensor fisik ke header pin Raspberry Pi Pico sesuai tabel berikut:
+
+| Modul / Sensor | Pin Modul | Pin Fisik Pico | Pin GPIO Pico | Catatan Koneksi Fisik |
+| :--- | :--- | :--- | :--- | :--- |
+| **ADXL345 (Getaran)**<br>*(Standar 4 Kabel)* | **VCC** | **Pin 36** | **3V3 (OUT)** | Catu daya logika 3.3V. |
+| | **GND** | **Pin 38** | **GND** | Arde bersama (*Common Ground*). |
+| | **SDA** | **Pin 26** | **GP20** | Jalur data bus I2C0. |
+| | **SCL** | **Pin 27** | **GP21** | Jalur clock bus I2C0. |
+| | **CS & SDO** | *NC* | *Tidak Perlu Kabel* | Dibiarkan lepas (modul GY-291 otomatis I2C di `0x53`). |
+| **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 36** | **3V3 (OUT)** | Daya logika 3.3V aman untuk RP2040. |
+| | **GND** (Hitam) | **Pin 38** | **GND** | Arde bersama. |
+| | **DQ** (Kuning) | **Pin 21** | **GP16** | Jalur data OneWire. |
+| | **Resistor 4.7 kΩ** | Antara DQ & 3V3 | Pin 21 & Pin 36 | Jumper resistor pull-up antara pin **GP16 (DQ)** dan **3V3**. |
+| **LCD 16x2 I2C**<br>*(PCF8574 Backpack)* | **VCC** | **Pin 40** | **VBUS (5V)** | Daya 5V langsung dari kabel USB untuk lampu latar LCD. |
+| | **GND** | **Pin 38** | **GND** | Arde bersama. |
+| | **SDA** | **Pin 26** | **GP20** | Jalur data bus I2C0 (Paralel dengan ADXL345). |
+| | **SCL** | **Pin 27** | **GP21** | Jalur clock bus I2C0 (Paralel dengan ADXL345). |
+| **Active Buzzer** | **Positif (+)** | **Pin 34** | **GP28** | Kontrol frekuensi PWM alarm 2500 Hz. |
+| | **Negatif (-)** | **Pin 38** | **GND** | Arde bersama. |
+
+---
+
+### Langkah 4: Kalibrasi Sensor ADXL345 & Live Monitor Sumbu XYZ di Terminal
+
+Repositori ini menyediakan modul mandiri [calibrate_adxl.py](calibrate_adxl.py) untuk kalibrasi offset dan streaming visual data akselerasi 3-sumbu.
+
+#### A. Cara Menjalankan Skrip Kalibrasi:
+1. Buka berkas [calibrate_adxl.py](calibrate_adxl.py) di Thonny IDE.
+2. Klik tombol **Run current script (F5)** atau klik tombol panah hijau di toolbar Thonny.
+3. Di jendela Shell Thonny akan muncul menu interaktif:
+   ```text
+   =============================================
+                 PILIHAN MENU:
+   =============================================
+    [1] Mulai Kalibrasi Sensor ADXL345 (Diam/Datar)
+    [2] Tampilkan Live Streaming Sumbu X, Y, Z
+    [3] Cek Status Offset Kalibrasi Saat Ini
+    [4] Tulis Offset ke Register Hardware (OFSX/Y/Z)
+    [5] Reset Offset Kalibrasi ke 0 (Hapus Offset)
+    [0] Keluar
+   =============================================
+   ```
+
+#### B. Prosedur Kalibrasi Offset (Menu 1):
+1. Letakkan sensor ADXL345 pada **permukaan yang rata, datar, dan stabil** (misalnya di atas meja kerja mesin).
+2. Pastikan sisi komponen chip menghadap ke atas sehingga sumbu Z tegak lurus searah gravitasi bumi ($Z = +1.00\text{ g}$, sedangkan $X = 0.00\text{ g}$ dan $Y = 0.00\text{ g}$).
+3. Ketik angka **`1`** lalu tekan **Enter**.
+4. Skrip akan menghitung mundur 3 detik, lalu mengambil 300 sampel data secara stabil.
+5. Skrip secara otomatis menghitung nilai simpangan (*offset error*) dan menyimpannya ke dalam berkas **`calib_adxl.json`** di dalam penyimpanan internal flash Pico:
+   ```json
+   {
+     "offset_x_g": -0.0156,
+     "offset_y_g": 0.0234,
+     "offset_z_g": -0.0468,
+     "offset_x_ms2": -0.1530,
+     "offset_y_ms2": 0.2295,
+     "offset_z_ms2": -0.4590
+   }
+   ```
+6. Parameter kalibrasi ini akan dibaca secara otomatis oleh program utama [main.py](main.py) saat sistem berjalan.
+
+#### C. Live Streaming Monitor Sumbu X, Y, Z (Menu 2):
+1. Ketik angka **`2`** lalu tekan **Enter**.
+2. Terminal Shell akan menampilkan streaming percepatan secara *real-time* (10 Hz / 100 ms) dengan format tabel rapi:
+   ```text
+   No  |   Sumbu X (g)   |   Sumbu Y (g)   |   Sumbu Z (g)   | Resultan R | Visual
+   ----+-----------------+-----------------+-----------------+------------+-------------
+   0001|  +0.002 g ( +0.02)|  -0.001 g ( -0.01)|  +1.001 g ( +9.82)|  1.001 g   | [....|█....]
+   0002|  -0.003 g ( -0.03)|  +0.000 g ( +0.00)|  +0.998 g ( +9.79)|  0.998 g   | [....|█....]
+   0003|  +0.001 g ( +0.01)|  -0.002 g ( -0.02)|  +1.000 g ( +9.81)|  1.000 g   | [....|█....]
+   ```
+3. Gerakkan atau ketuk sensor secara lembut untuk melihat perubahan nilai akselerasi dan visual grafik batang (*bar graph*).
+4. Tekan **`Ctrl + C`** di keyboard untuk menghentikan pemantauan live dan kembali ke menu utama.
+
+---
+
+### Langkah 5: Konfigurasi & Menjalankan `main.py` Secara Otomatis (Autostart 24/7)
+
+Setelah sensor terkalibrasi, sistem siap dijalankan untuk pemantauan mesin bor duduk secara penuh:
+
+1. Buka berkas [main.py](main.py) di Thonny IDE.
+2. Sesuaikan konfigurasi pada baris 15–28 untuk mode hardware nyata:
+   ```python
+   # ===================== KONFIGURASI HARDWARE FISIK =====================
+   SENSOR    = "ADXL345"       # Gunakan driver sensor ADXL345 fisik
+   SIM_GETAR = False           # Nonaktifkan generator getaran sintetis Wokwi
+   REMOVE_DC = True            # Aktifkan filter DC untuk menghilangkan bias 1g gravitasi bumi
+
+   # WiFi & ThingsBoard EU
+   WIFI_SSID = "Nama_Hotspot_Anda"      # Ganti dengan SSID WiFi Anda
+   WIFI_PASS = "Password_WiFi_Anda"     # Ganti dengan Password WiFi Anda
+   TB_TOKEN  = "4M6BoXXbvLbZ5MzS56NS"   # Token perangkat ThingsBoard EU
+   ```
+3. Klik menu **File** $\rightarrow$ **Save as...** $\rightarrow$ Pilih **Raspberry Pi Pico**.
+4. Beri nama berkas tepat **`main.py`** dan klik **OK**.
+5. Program akan otomatis berjalan setiap kali Raspberry Pi Pico dinyalakan atau diberi daya dari kabel USB / charger 5V mesin bor tanpa memerlukan koneksi PC!
+
+## 🍓 4. Panduan Detail Menjalankan di Raspberry Pi 4 (Hardware Fisik)
 
 Sistem pemantauan ini dirancang siap jalan di lingkungan industri menggunakan komputer papan tunggal **Raspberry Pi 4 Model B** dengan skrip [rpi4_main.py](rpi4_main.py).
 
@@ -309,7 +426,7 @@ Agar skrip berjalan otomatis saat mesin pabrik dinyalakan tanpa perlu login manu
 
 ---
 
-## 📁 4. Struktur Berkas
+## 📁 5. Struktur Berkas
 
 ```
 predictive_maintenance_wokwi_simulator/
@@ -317,6 +434,7 @@ predictive_maintenance_wokwi_simulator/
 ├── wokwi.toml            # Konfigurasi simulasi Wokwi
 ├── firmware.uf2          # MicroPython binary untuk Pico W
 ├── main.py               # Program utama Pico W standalone (Driver Sensor, FFT, RMS, Alarm, MQTT & HTTP)
+├── calibrate_adxl.py     # Skrip kalibrasi offset & live monitor XYZ sensor ADXL345 (MicroPython Pico)
 ├── rpi4_main.py          # Program utama fisik Raspberry Pi 4 (Linux, Python 3, Paho MQTT)
 ├── WIRING_DIAGRAM.svg    # Skema diagram canvas Wokwi resolusi tinggi
 ├── WIRING_PREVIEW.html   # Pratinjau wiring interaktif di browser
@@ -326,7 +444,7 @@ predictive_maintenance_wokwi_simulator/
 
 ---
 
-## ⚠️ 5. Ambang Batas (Thresholds) & Simulasi Monitoring Mesin Bor Duduk (ISO 10816)
+## ⚠️ 6. Ambang Batas (Thresholds) & Simulasi Monitoring Mesin Bor Duduk (ISO 10816)
 
 Sistem ini dirancang khusus untuk memantau kesehatan bantalan poros utama (*spindle bearing*) pada **Mesin Bor Duduk (*Bench Drill Machine*)** berdasarkan standar getaran internasional **ISO 10816-3 (Class 1: Mesin Perkakas Berputar)**.
 
@@ -369,7 +487,7 @@ Anda dapat menguji respon sistem (LCD, Buzzer, dan ThingsBoard) dengan menggeser
 
 ---
 
-## 📡 6. Konfigurasi ThingsBoard EU & Format Telemetri
+## 📡 7. Konfigurasi ThingsBoard EU & Format Telemetri
 
 * **Server:** `eu.thingsboard.cloud` (Port MQTT: `1883`, Port HTTP: `80` / `443`)
 * **Access Token:** `4M6BoXXbvLbZ5MzS56NS`
