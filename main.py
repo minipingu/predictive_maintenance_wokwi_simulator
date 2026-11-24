@@ -52,13 +52,18 @@ SIM_X = (F_SHAFT, 1.5)      # Sumbu X: getaran unbalance putaran spindle (25 Hz)
 SIM_Y = (F_HARMONIC2, 1.0)  # Sumbu Y: getaran transmisi sabuk/pulley bor (50 Hz)
 SIM_Z = (F_BEARING, 0.5)    # Sumbu Z: getaran aksial lintasan bola bearing (77.5 Hz)
 
-# ===================== DRIVER BUZZER ALARM =====================
+# ===================== DRIVER BUZZER ALARM (SIRINE AMBULANS) =====================
 buzzer_pwm = PWM(Pin(PIN_BZ))
 buzzer_pwm.duty_u16(0)
 
-def set_buzzer(active=True):
+# Frekuensi nada sirine ambulans standar (Dua Nada Hi-Lo: 960 Hz & 770 Hz)
+NADA_SIREN_HI = 960   # Hz (Nada tinggi "Nee")
+NADA_SIREN_LO = 770   # Hz (Nada rendah "Naw")
+
+def set_buzzer(active=True, freq=NADA_SIREN_HI):
+    """Mengontrol status buzzer alarm (PWM 50% duty saat aktif)"""
     if active:
-        buzzer_pwm.freq(2500)
+        buzzer_pwm.freq(freq)
         buzzer_pwm.duty_u16(32768)  # 50% duty cycle, suara aktif
     else:
         buzzer_pwm.duty_u16(0)      # Senyap (duty 0%)
@@ -218,14 +223,14 @@ except Exception as e:
 
 # 3. Prompt Peringatan di LCD jika Sensor Tidak Terdeteksi
 if not sensor_vibr_ok or not sensor_temp_ok:
-    # Bip peringatan (2x bip pendek)
+    # Bip peringatan (2x nada sirine ambulans pendek)
     try:
-        set_buzzer(True)
-        time.sleep_ms(80)
-        set_buzzer(False)
-        time.sleep_ms(80)
-        set_buzzer(True)
-        time.sleep_ms(80)
+        set_buzzer(True, NADA_SIREN_HI)
+        time.sleep_ms(120)
+        set_buzzer(True, NADA_SIREN_LO)
+        time.sleep_ms(120)
+        set_buzzer(True, NADA_SIREN_HI)
+        time.sleep_ms(120)
         set_buzzer(False)
     except Exception:
         pass
@@ -395,6 +400,11 @@ def ambil_sampel():
         ay[i] = y
         az[i] = z
         nxt = time.ticks_add(nxt, periode)
+
+        # Modulasi Sirine Ambulans (Non-Blocking: Bergantian 960 Hz & 770 Hz setiap 320 ms)
+        if alarm_active and (i & 63 == 0):
+            buzzer_pwm.freq(NADA_SIREN_HI if (i & 64 == 0) else NADA_SIREN_LO)
+            buzzer_pwm.duty_u16(32768)
     dt = time.ticks_diff(t_akhir, t_awal) / 1000000.0
     fs = (N - 1) / dt if dt > 0 else FS_TARGET
     return ax, ay, az, fs
@@ -523,6 +533,7 @@ def kirim_tb(data):
 
 # ===================== LOOP UTAMA DENGAN THRESHOLD =====================
 no = 0
+alarm_active = False
 while True:
     no += 1
     t_konv = time.ticks_ms()
@@ -591,9 +602,9 @@ while True:
     if lcd:
         lcd.write_lines(line1_lcd, line2_lcd)
 
-    # Kontrol Buzzer Alarm
+    # Kontrol Buzzer Alarm Sirine Ambulans
     if alarm_active:
-        set_buzzer(True)
+        set_buzzer(True, NADA_SIREN_HI)
     else:
         set_buzzer(False)
 
@@ -625,4 +636,15 @@ while True:
     }
     kirim_tb(data)
     print()
-    time.sleep_ms(800)
+
+    # Jeda antar-pengukuran: jika alarm aktif, bunyikan sirine ambulans bergantian (400ms HI / 400ms LO)
+    if alarm_active:
+        buzzer_pwm.freq(NADA_SIREN_HI)
+        buzzer_pwm.duty_u16(32768)
+        time.sleep_ms(400)
+        buzzer_pwm.freq(NADA_SIREN_LO)
+        buzzer_pwm.duty_u16(32768)
+        time.sleep_ms(400)
+    else:
+        set_buzzer(False)
+        time.sleep_ms(800)

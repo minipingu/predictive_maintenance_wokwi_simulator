@@ -64,17 +64,19 @@
     <circle cx="18" cy="18" r="8" fill="#1e1e24" stroke="#ffd700" stroke-width="2"/>
     <circle cx="162" cy="18" r="8" fill="#1e1e24" stroke="#ffd700" stroke-width="2"/>
     
-    <!-- MPU-6050 QFN Chip -->
+    <!-- MPU-6050 / ADXL345 QFN Chip -->
     <rect x="60" y="60" width="60" height="60" rx="3" fill="#151515" stroke="#333" stroke-width="1.5"/>
     <circle cx="70" cy="70" r="2.5" fill="#e0e0e0"/>
-    <text x="90" y="95" fill="#bdbdbd" font-size="9" font-weight="bold" text-anchor="middle">MPU-6050</text>
+    <text x="90" y="88" fill="#ffffff" font-size="8.5" font-weight="bold" text-anchor="middle">ADXL / MPU</text>
+    <text x="90" y="103" fill="#80d8ff" font-size="7.5" text-anchor="middle">0x53 / 0x68</text>
 
     <!-- Silk Screen Labels -->
-    <text x="90" y="35" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">GY-521 ACCEL</text>
-    <text x="90" y="145" fill="#ce93d8" font-size="10" text-anchor="middle">±4g / I2C Bus</text>
+    <text x="90" y="30" fill="#ffffff" font-size="11.5" font-weight="bold" text-anchor="middle">ADXL345 / MPU-6050</text>
+    <text x="90" y="46" fill="#ffd54f" font-size="8" font-weight="bold" text-anchor="middle">ADXL345 (Fisik) | MPU (Wokwi)</text>
+    <text x="90" y="145" fill="#ce93d8" font-size="9.5" text-anchor="middle">±4g / ±16g I2C Bus</text>
 
-    <!-- Header Pins (Bottom) -->
-    <!-- Pins: VCC, GND, SCL, SDA, XDA, XCL, AD0, INT -->
+    <!-- Header Pins (Bottom) - Standar Pinout GY-291 (ADXL345) / GY-521 (MPU-6050) -->
+    <!-- Pins: VCC, GND, CS, INT1, INT2, SDO, SDA, SCL -->
     <g transform="translate(14, 180)">
       <!-- Solder pads -->
       <g fill="#ffd700" stroke="#b8860b" stroke-width="1.5">
@@ -99,15 +101,16 @@
         <circle cx="147.5" cy="32" r="3.5"/>
       </g>
       <!-- Labels -->
-      <g font-size="8.5" fill="#ffffff" font-weight="bold" text-anchor="middle">
-        <text x="7.5" y="14">VCC</text>
-        <text x="27.5" y="14">GND</text>
-        <text x="47.5" y="14">SCL</text>
-        <text x="67.5" y="14">SDA</text>
-        <text x="87.5" y="14">XDA</text>
-        <text x="107.5" y="14">XCL</text>
-        <text x="127.5" y="14">AD0</text>
-        <text x="147.5" y="14">INT</text>
+      <g font-size="8" fill="#ffffff" font-weight="bold" text-anchor="middle">
+        <text x="7.5" y="14" fill="#ff7043">VCC</text>
+        <text x="27.5" y="14" fill="#90a4ae">GND</text>
+        <text x="47.5" y="14" fill="#ff8a80">CS</text>
+        <text x="47.5" y="47" fill="#ff8a80" font-size="7" font-weight="bold">3.3V</text>
+        <text x="67.5" y="14" fill="#78909c">INT1</text>
+        <text x="87.5" y="14" fill="#78909c">INT2</text>
+        <text x="107.5" y="14" fill="#90a4ae">SDO</text>
+        <text x="127.5" y="14" fill="#2979ff">SDA</text>
+        <text x="147.5" y="14" fill="#ffc107">SCL</text>
       </g>
     </g>
   </g>
@@ -392,27 +395,32 @@
     <circle cx="410" cy="250" r="4" fill="#e74c3c"/>
     <circle cx="708" cy="259" r="4" fill="#e74c3c"/>
 
-    <!-- WIRE 5: MPU6050 VCC -> Pico 3V3 (Pin 36, Red) -->
-    <!-- mpu:VCC = (121.5, 642) -> joins r1:2 / pico:3V3 -->
+    <!-- WIRE 5: Sensor VCC -> Pico 3V3 (Pin 36, Red) -->
+    <!-- sensor:VCC = (121.5, 642) -> joins r1:2 / pico:3V3 -->
     <path d="M 121.5,642 L 121.5,700 L 465,700 L 465,259 L 708,259" fill="none" stroke="#e74c3c" stroke-width="4"/>
     <circle cx="121.5" cy="642" r="4" fill="#e74c3c"/>
 
-    <!-- WIRE 6: MPU6050 GND -> Pico GND.6 (Pin 28, Black) [AD0 NC - Cukup 4 Kabel!] -->
-    <!-- mpu:GND = (141.5, 642) -> pico:GND.6 = (708, 459) -->
+    <!-- WIRE 5B: ADXL345 CS -> Jumper ke VCC 3.3V (Kabel CS ke 3.3V) -->
+    <path d="M 161.5,642 L 161.5,675 L 121.5,675" fill="none" stroke="#ff8a80" stroke-width="3"/>
+    <circle cx="161.5" cy="642" r="3.5" fill="#ff8a80" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="121.5" cy="675" r="3.5" fill="#e74c3c"/>
+
+    <!-- WIRE 6: Sensor GND -> Pico GND.6 (Pin 28, Black) -->
+    <!-- sensor:GND = (141.5, 642) -> pico:GND.6 = (708, 459) -->
     <path d="M 141.5,642 L 141.5,715 L 455,715 L 455,459 L 708,459" fill="none" stroke="#2c3e50" stroke-width="4"/>
     <circle cx="141.5" cy="642" r="4" fill="#2c3e50"/>
     <circle cx="708" cy="459" r="4" fill="#2c3e50"/>
 
-    <!-- WIRE 7: MPU6050 SDA -> Pico GP20 (Pin 26, Blue) -->
-    <!-- mpu:SDA = (181.5, 642) -> pico:GP20 = (708, 509) -->
-    <path d="M 181.5,642 L 181.5,675 L 440,675 L 440,509 L 708,509" fill="none" stroke="#3498db" stroke-width="4"/>
-    <circle cx="181.5" cy="642" r="4" fill="#3498db"/>
+    <!-- WIRE 7: Sensor SDA -> Pico GP20 (Pin 26, Blue) -->
+    <!-- sensor:SDA = (241.5, 642) -> pico:GP20 = (708, 509) -->
+    <path d="M 241.5,642 L 241.5,675 L 440,675 L 440,509 L 708,509" fill="none" stroke="#3498db" stroke-width="4"/>
+    <circle cx="241.5" cy="642" r="4" fill="#3498db"/>
     <circle cx="708" cy="509" r="4" fill="#3498db"/>
 
-    <!-- WIRE 8: MPU6050 SCL -> Pico GP21 (Pin 27, Gold/Yellow) -->
-    <!-- mpu:SCL = (161.5, 642) -> pico:GP21 = (708, 484) -->
-    <path d="M 161.5,642 L 161.5,660 L 425,660 L 425,484 L 708,484" fill="none" stroke="#f1c40f" stroke-width="4"/>
-    <circle cx="161.5" cy="642" r="4" fill="#f1c40f"/>
+    <!-- WIRE 8: Sensor SCL -> Pico GP21 (Pin 27, Gold/Yellow) -->
+    <!-- sensor:SCL = (261.5, 642) -> pico:GP21 = (708, 484) -->
+    <path d="M 261.5,642 L 261.5,660 L 425,660 L 425,484 L 708,484" fill="none" stroke="#f1c40f" stroke-width="4"/>
+    <circle cx="261.5" cy="642" r="4" fill="#f1c40f"/>
     <circle cx="708" cy="484" r="4" fill="#f1c40f"/>
 
     
@@ -454,25 +462,30 @@
   <!-- ====================================================================== -->
   <!-- 7. COLOR LEGEND CARD (Bottom Left) -->
   <!-- ====================================================================== -->
-  <g transform="translate(30, 690)">
-    <rect x="0" y="0" width="380" height="85" rx="8" fill="#181a1f" stroke="#2c303c" stroke-width="1.5" filter="url(#wokwiShadow)"/>
-    <text x="15" y="22" fill="#ffffff" font-size="12" font-weight="bold">LEGENDA KABEL WOKWI (DIAGRAM.JSON):</text>
+  <g transform="translate(30, 680)">
+    <rect x="0" y="0" width="390" height="100" rx="8" fill="#181a1f" stroke="#2c303c" stroke-width="1.5" filter="url(#wokwiShadow)"/>
+    <text x="15" y="20" fill="#ffffff" font-size="11.5" font-weight="bold">LEGENDA KABEL WIRING PICO W (ADXL/MPU):</text>
     
     <!-- Red: VCC 5V/3.3V -->
-    <line x1="20" y1="40" x2="45" y2="40" stroke="#e74c3c" stroke-width="4"/>
-    <text x="52" y="44" fill="#e0e0e0" font-size="10">VCC (VBUS 5V / 3V3)</text>
+    <line x1="20" y1="36" x2="45" y2="36" stroke="#e74c3c" stroke-width="4"/>
+    <text x="52" y="40" fill="#e0e0e0" font-size="9.5">VCC (VBUS 5V / 3V3)</text>
     
     <!-- Black: GND -->
-    <line x1="200" y1="40" x2="225" y2="40" stroke="#2c3e50" stroke-width="4"/>
-    <text x="232" y="44" fill="#e0e0e0" font-size="10">GND (Ground)</text>
+    <line x1="200" y1="36" x2="225" y2="36" stroke="#2c3e50" stroke-width="4"/>
+    <text x="232" y="40" fill="#e0e0e0" font-size="9.5">GND (Ground)</text>
     
     <!-- Green: DQ 1-Wire -->
-    <line x1="20" y1="62" x2="45" y2="62" stroke="#2ecc71" stroke-width="4"/>
-    <text x="52" y="66" fill="#e0e0e0" font-size="10">DQ Data (GP16)</text>
+    <line x1="20" y1="56" x2="45" y2="56" stroke="#2ecc71" stroke-width="4"/>
+    <text x="52" y="60" fill="#e0e0e0" font-size="9.5">DQ Data (GP16)</text>
     
     <!-- Blue & Gold: SDA / SCL -->
-    <line x1="200" y1="62" x2="215" y2="62" stroke="#3498db" stroke-width="4"/>
-    <line x1="218" y1="62" x2="233" y2="62" stroke="#f1c40f" stroke-width="4"/>
-    <text x="240" y="66" fill="#e0e0e0" font-size="10">I2C: SDA (GP20) / SCL (GP21)</text>
+    <line x1="200" y1="56" x2="215" y2="56" stroke="#3498db" stroke-width="4"/>
+    <line x1="218" y1="56" x2="233" y2="56" stroke="#f1c40f" stroke-width="4"/>
+    <text x="240" y="60" fill="#e0e0e0" font-size="9.5">I2C: SDA (GP20) / SCL (GP21)</text>
+
+    <!-- Coral: CS to 3.3V -->
+    <line x1="20" y1="76" x2="45" y2="76" stroke="#ff8a80" stroke-width="3"/>
+    <text x="52" y="80" fill="#ff8a80" font-size="9.5" font-weight="bold">CS ➔ 3V3 (Wajib untuk ADXL345 I2C)</text>
+    <text x="15" y="94" fill="#ffd54f" font-size="8.5">*(Jika pakai MPU-6050 di Wokwi: cukup 4 kabel VCC, GND, SDA, SCL)*</text>
   </g>
 </svg>

@@ -63,14 +63,14 @@
     <circle cx="159" cy="16" r="6.5" fill="#14171f" stroke="#ffd700" stroke-width="1.5"/>
     
     <!-- Title -->
-    <text x="87" y="24" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">ADXL345 (FISIK)</text>
-    <text x="87" y="38" fill="#90caf9" font-size="9" text-anchor="middle">3-Axis Accelerometer</text>
+    <text x="87" y="22" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">ADXL345 (FISIK) / MPU-6050</text>
+    <text x="87" y="36" fill="#ffd54f" font-size="8" font-weight="bold" text-anchor="middle">ADXL345 (Fisik) | MPU-6050 (Wokwi)</text>
 
     <!-- ADXL345 QFN Chip (Black) -->
     <rect x="62" y="46" width="50" height="42" rx="3" fill="#151515" stroke="#37474f" stroke-width="1.5"/>
     <circle cx="71" cy="54" r="2" fill="#cfd8dc"/>
-    <text x="87" y="65" fill="#eceff1" font-size="8.5" font-weight="bold" text-anchor="middle">ADXL345</text>
-    <text x="87" y="77" fill="#4fc3f7" font-size="8" text-anchor="middle">I2C: 0x53</text>
+    <text x="87" y="65" fill="#eceff1" font-size="8" font-weight="bold" text-anchor="middle">ADXL345/MPU</text>
+    <text x="87" y="77" fill="#4fc3f7" font-size="7.5" text-anchor="middle">0x53 / 0x68</text>
 
     <!-- 8 Header Pins at Bottom: VCC, GND, CS, INT1, INT2, SDO, SDA, SCL -->
     <!-- Pin X relative: 12, 32, 52, 72, 92, 112, 132, 152 -->
@@ -95,6 +95,7 @@
 
         <circle cx="48" cy="32" r="3.5" fill="#14171f"/>
         <text x="48" y="14" fill="#ff8a80">CS</text>
+        <text x="48" y="47" fill="#ff8a80" font-size="7" font-weight="bold">3.3V</text>
 
         <circle cx="68" cy="32" r="3.5" fill="#14171f"/>
         <text x="68" y="14" fill="#78909c">INT1</text>
@@ -483,6 +484,11 @@
     <circle cx="51" cy="212" r="3.5" fill="#ff7043" stroke="#ffffff" stroke-width="1"/>
     <circle cx="475" cy="386" r="3.5" fill="#ffffff"/>
 
+    <!-- WIRE 4B: ADXL345 CS (X=91, Y=212) -> Jumper to VCC 3.3V Line (X=51, Y=270) -->
+    <path d="M 91,212 L 91,270 L 51,270" fill="none" stroke="#ff8a80" stroke-width="2.5"/>
+    <circle cx="91" cy="212" r="3.5" fill="#ff8a80" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="51" cy="270" r="3" fill="#ff7043"/>
+
     <!-- ===== I2C BUS: SDA (BLUE #2979ff) ===== -->
     <!-- WIRE 6: ADXL345 SDA (X=171, Y=212) & LCD SDA (X=1037, Y=205) -> Pin 3 (X=497, Y=386) -->
     <!-- Enters Pin 3 from below (Y=445) -->
@@ -547,16 +553,17 @@
     <!-- Table Header Title -->
     <text x="25" y="28" fill="#38bdf8" font-size="14" font-weight="bold">📋 DAFTAR KONEKSI PIN-TO-PIN RASPBERRY PI 4 (HEADER 40-PIN):</text>
 
-    <!-- Column 1: ADXL345 -->
+    <!-- Column 1: ADXL345 / MPU-6050 -->
     <g transform="translate(25, 45)">
       <rect x="0" y="0" width="285" height="170" rx="6" fill="#141822" stroke="#283244"/>
-      <text x="15" y="24" fill="#90caf9" font-size="12" font-weight="bold">1. ADXL345 (4 Kabel Cukup!):</text>
-      <text x="15" y="48" fill="#e0e0e0" font-size="11">• VCC  ➔ <tspan fill="#ff7043" font-weight="bold">Pin 1</tspan> (3.3V Power)</text>
-      <text x="15" y="72" fill="#e0e0e0" font-size="11">• GND  ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 9</tspan> (Ground)</text>
-      <text x="15" y="96" fill="#e0e0e0" font-size="11">• SDA  ➔ <tspan fill="#2979ff" font-weight="bold">Pin 3</tspan> (GPIO 2, I2C1 SDA)</text>
-      <text x="15" y="120" fill="#e0e0e0" font-size="11">• SCL  ➔ <tspan fill="#ffc107" font-weight="bold">Pin 5</tspan> (GPIO 3, I2C1 SCL)</text>
-      <text x="15" y="145" fill="#81c784" font-size="10.5" font-weight="bold">✓ CS &amp; SDO: NC (Tidak Perlu Kabel)</text>
-      <text x="15" y="159" fill="#90a4ae" font-size="9.5">Modul GY-291 sudah ada resistor internal</text>
+      <text x="15" y="24" fill="#90caf9" font-size="12" font-weight="bold">1. ADXL345 (Fisik) / MPU-6050:</text>
+      <text x="15" y="46" fill="#e0e0e0" font-size="11">• VCC ➔ <tspan fill="#ff7043" font-weight="bold">Pin 1</tspan> (3.3V Power)</text>
+      <text x="15" y="66" fill="#e0e0e0" font-size="11">• GND ➔ <tspan fill="#90a4ae" font-weight="bold">Pin 9</tspan> (Ground)</text>
+      <text x="15" y="86" fill="#e0e0e0" font-size="11">• CS  ➔ <tspan fill="#ff8a80" font-weight="bold">Pin 1 / 3.3V</tspan> (Kabel CS ke 3.3V)</text>
+      <text x="15" y="106" fill="#e0e0e0" font-size="11">• SDA ➔ <tspan fill="#2979ff" font-weight="bold">Pin 3</tspan> (GPIO 2, I2C1 SDA)</text>
+      <text x="15" y="126" fill="#e0e0e0" font-size="11">• SCL ➔ <tspan fill="#ffc107" font-weight="bold">Pin 5</tspan> (GPIO 3, I2C1 SCL)</text>
+      <text x="15" y="148" fill="#81c784" font-size="10" font-weight="bold">✓ CS ke 3.3V: Mengunci mode komunikasi I2C</text>
+      <text x="15" y="161" fill="#90a4ae" font-size="9">*(Jika pakai MPU-6050: cukup VCC, GND, SDA, SCL)*</text>
     </g>
 
     <!-- Column 2: DS18B20 -->

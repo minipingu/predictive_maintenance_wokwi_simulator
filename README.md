@@ -247,11 +247,13 @@ Hubungkan modul sensor fisik ke header pin Raspberry Pi Pico sesuai tabel beriku
 
 | Modul / Sensor | Pin Modul | Pin Fisik Pico | Pin GPIO Pico | Catatan Koneksi Fisik |
 | :--- | :--- | :--- | :--- | :--- |
-| **ADXL345 (Getaran)**<br>*(Standar 4 Kabel)* | **VCC** | **Pin 36** | **3V3 (OUT)** | Catu daya logika 3.3V. |
+| **ADXL345 (Getaran Fisik)**<br>*(Atau MPU-6050 di Wokwi)* | **VCC** | **Pin 36** | **3V3 (OUT)** | Catu daya logika 3.3V. |
 | | **GND** | **Pin 38** | **GND** | Arde bersama (*Common Ground*). |
+| | **CS** | **Pin 36** | **3V3 (OUT)** | **Kabel CS ke 3.3V (VCC):** Wajib disambung ke 3.3V untuk mengunci mode komunikasi I2C pada modul ADXL345. |
 | | **SDA** | **Pin 26** | **GP20** | Jalur data bus I2C0. |
 | | **SCL** | **Pin 27** | **GP21** | Jalur clock bus I2C0. |
-| | **CS & SDO** | *NC* | *Tidak Perlu Kabel* | Dibiarkan lepas (modul GY-291 otomatis I2C di `0x53`). |
+| | **SDO** | *NC* | *Dibiarkan Lepas* | Alamat default I2C `0x53`. *(Jika ke GND: 0x53, jika ke 3.3V: 0x1D)*. |
+| *(Jika Pakai MPU-6050)* | **VCC, GND, SDA, SCL** | Sesuai di atas | Sesuai di atas | Pada modul MPU-6050 cukup 4 pin (VCC ke 3V3, GND, GP20 SDA, GP21 SCL). |
 | **DS18B20 (Suhu)** | **VCC** (Merah) | **Pin 36** | **3V3 (OUT)** | Daya logika 3.3V aman untuk RP2040. |
 | | **GND** (Hitam) | **Pin 38** | **GND** | Arde bersama. |
 | | **DQ** (Kuning) | **Pin 21** | **GP16** | Jalur data OneWire. |
@@ -260,7 +262,7 @@ Hubungkan modul sensor fisik ke header pin Raspberry Pi Pico sesuai tabel beriku
 | | **GND** | **Pin 38** | **GND** | Arde bersama. |
 | | **SDA** | **Pin 26** | **GP20** | Jalur data bus I2C0 (Paralel dengan ADXL345). |
 | | **SCL** | **Pin 27** | **GP21** | Jalur clock bus I2C0 (Paralel dengan ADXL345). |
-| **Active Buzzer** | **Positif (+)** | **Pin 34** | **GP28** | Kontrol frekuensi PWM alarm 2500 Hz. |
+| **Active Buzzer** | **Positif (+)** | **Pin 34** | **GP28** | Sirine ambulans dua nada Hi-Lo (960 Hz & 770 Hz PWM). |
 | | **Negatif (-)** | **Pin 38** | **GND** | Arde bersama. |
 
 ---
