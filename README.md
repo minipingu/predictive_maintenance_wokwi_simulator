@@ -265,14 +265,48 @@ Hubungkan modul sensor fisik ke header pin Raspberry Pi Pico sesuai tabel beriku
 
 ---
 
-### Langkah 4: Kalibrasi Sensor ADXL345 & Live Monitor Sumbu XYZ di Terminal
+### Langkah 4: Kalibrasi Otomatis 1x Terintegrasi dalam `main.py` & Deteksi Sensor di LCD
 
-Repositori ini menyediakan modul mandiri [calibrate_adxl.py](calibrate_adxl.py) untuk kalibrasi offset dan streaming visual data akselerasi 3-sumbu.
+Kini kalibrasi offset akselerometer telah **terintegrasi penuh dalam 1 berkas tunggal** [main.py](main.py) sehingga Anda tidak wajib menjalankan skrip terpisah:
+
+#### A. Diagnostik Hardware & Prompt LCD Otomatis saat Booting
+Saat Raspberry Pi Pico pertama kali diberi daya, [main.py](main.py) langsung memindai bus I2C (`0x53`/`0x1D`) dan bus OneWire (`GP16`):
+1. **Pemeriksaan Sensor ADXL345 / MPU-6050:**
+   * Membaca register `DEVID (0x00)`. Jika nilai adalah `0xE5`, sensor ADXL345 dikonfirmasi aktif.
+2. **Pemeriksaan Sensor Suhu DS18B20:**
+   * Melakukan pemindaian ROM OneWire (`ds.scan()`).
+3. **Peringatan Jika Sensor Terlepas / Rusak:**
+   * Buzzer berbunyi **2x bip pendek** sebagai peringatan audio.
+   * Layar LCD 16x2 menampilkan prompt status selama 3 detik:
+     * `ERR: NO ADXL345!` / `CEK KABEL I2C!` *(jika kabel SDA/SCL longgar)*
+     * `ERR: NO DS18B20!` / `CEK KABEL DATA!` *(jika kabel data atau resistor 4.7k lepas)*
+     * `ERR: NO SENSORS!` / `CEK ADXL & DS18!` *(jika kedua sensor tidak terdeteksi)*
+   * Pada loop monitoring utama, jika sensor terlepas sewaktu-waktu, sistem tetap aman tanpa *crash* dan menampilkan status error di LCD (`ERR: NO ADXL!` atau `ERR: NO DS18B20!`) serta otomatis menyambung kembali (*auto-reconnect*) begitu kabel dipasang.
+
+#### B. Kalibrasi Offset 1x Otomatis Saat Program Berjalan (`kalibrasi_otomatis_1x`):
+1. Setelah diagnostik lolos, fungsi `kalibrasi_otomatis_1x(n_sampel=60)` langsung berjalan 1 kali.
+2. Layar LCD menampilkan:
+   ```text
+   KALIBRASI ADXL...
+   POSISI DIAM...
+   ```
+3. **Penting:** Pastikan mesin bor/sensor dalam **posisi diam dan datar** selama ~1,5 detik.
+4. Program mengambil 60 sampel, menghitung nilai offset sumbu ($X=0\text{ g}, Y=0\text{ g}, Z=+1\text{ g}$), menyimpannya ke memori flash `calib_adxl.json`, dan menampilkan konfirmasi di LCD:
+   ```text
+   KALIBRASI OK!
+   OFFSET TERSIMPAN
+   ```
+
+---
+
+### Langkah 5: Opsi Kalibrasi Lanjutan & Live XYZ Monitor via `calibrate_adxl.py` (Opsional)
+
+Jika Anda ingin memantau grafik streaming real-time sumbu X, Y, Z atau menuliskan nilai offset langsung ke register internal chip ADXL345 (`OFSX`, `OFSY`, `OFSZ`), Anda dapat menggunakan modul pembantu interaktif [calibrate_adxl.py](calibrate_adxl.py):
 
 #### A. Cara Menjalankan Skrip Kalibrasi:
-1. Buka berkas [calibrate_adxl.py](calibrate_adxl.py) di Thonny IDE.
-2. Klik tombol **Run current script (F5)** atau klik tombol panah hijau di toolbar Thonny.
-3. Di jendela Shell Thonny akan muncul menu interaktif:
+1. Buka berkas [calibrate_adxl.py](calibrate_adxl.py) di Thonny IDE atau VS Code.
+2. Tekan tombol **Run (F5)** atau `Ctrl + Alt + R` (MicroPico).
+3. Di jendela Shell / Terminal akan muncul menu interaktif:
    ```text
    =============================================
                  PILIHAN MENU:
@@ -287,11 +321,10 @@ Repositori ini menyediakan modul mandiri [calibrate_adxl.py](calibrate_adxl.py) 
    ```
 
 #### B. Prosedur Kalibrasi Offset (Menu 1):
-1. Letakkan sensor ADXL345 pada **permukaan yang rata, datar, dan stabil** (misalnya di atas meja kerja mesin).
-2. Pastikan sisi komponen chip menghadap ke atas sehingga sumbu Z tegak lurus searah gravitasi bumi ($Z = +1.00\text{ g}$, sedangkan $X = 0.00\text{ g}$ dan $Y = 0.00\text{ g}$).
+1. Letakkan sensor ADXL345 pada **permukaan yang rata, datar, dan stabil**.
+2. Pastikan sisi komponen chip menghadap ke atas ($Z = +1.00\text{ g}$, $X = 0.00\text{ g}$, $Y = 0.00\text{ g}$).
 3. Ketik angka **`1`** lalu tekan **Enter**.
-4. Skrip akan menghitung mundur 3 detik, lalu mengambil 300 sampel data secara stabil.
-5. Skrip secara otomatis menghitung nilai simpangan (*offset error*) dan menyimpannya ke dalam berkas **`calib_adxl.json`** di dalam penyimpanan internal flash Pico:
+4. Skrip mengambil 300 sampel data secara presisi dan memperbarui berkas **`calib_adxl.json`**:
    ```json
    {
      "offset_x_g": -0.0156,
@@ -302,7 +335,6 @@ Repositori ini menyediakan modul mandiri [calibrate_adxl.py](calibrate_adxl.py) 
      "offset_z_ms2": -0.4590
    }
    ```
-6. Parameter kalibrasi ini akan dibaca secara otomatis oleh program utama [main.py](main.py) saat sistem berjalan.
 
 #### C. Live Streaming Monitor Sumbu X, Y, Z (Menu 2):
 1. Ketik angka **`2`** lalu tekan **Enter**.
@@ -314,12 +346,11 @@ Repositori ini menyediakan modul mandiri [calibrate_adxl.py](calibrate_adxl.py) 
    0002|  -0.003 g ( -0.03)|  +0.000 g ( +0.00)|  +0.998 g ( +9.79)|  0.998 g   | [....|█....]
    0003|  +0.001 g ( +0.01)|  -0.002 g ( -0.02)|  +1.000 g ( +9.81)|  1.000 g   | [....|█....]
    ```
-3. Gerakkan atau ketuk sensor secara lembut untuk melihat perubahan nilai akselerasi dan visual grafik batang (*bar graph*).
-4. Tekan **`Ctrl + C`** di keyboard untuk menghentikan pemantauan live dan kembali ke menu utama.
+3. Tekan **`Ctrl + C`** untuk menghentikan pemantauan live dan kembali ke menu utama.
 
 ---
 
-### Langkah 5: Konfigurasi & Menjalankan `main.py` Secara Otomatis (Autostart 24/7)
+### Langkah 6: Konfigurasi & Menjalankan `main.py` Secara Otomatis (Autostart 24/7)
 
 Setelah sensor terkalibrasi, sistem siap dijalankan untuk pemantauan mesin bor duduk secara penuh:
 

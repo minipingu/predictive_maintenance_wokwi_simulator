@@ -112,7 +112,7 @@ class I2cLcd:
             for c in s2: self._write(ord(c), 1)
             self._last_l2 = s2
 
-# ===================== INISIALISASI I2C & SENSOR =====================
+# ===================== INISIALISASI I2C & LCD =====================
 i2c = I2C(0, sda=Pin(PIN_SDA), scl=Pin(PIN_SCL), freq=100000)
 
 lcd = None
@@ -126,60 +126,182 @@ except Exception:
     pass
 
 if lcd:
-    lcd.write_lines("PREDICTIVE MAINT", "INITIALIZING...")
+    lcd.write_lines("PREDICTIVE MAINT", "DIAGNOSTIK HW...")
 
-# Sensor Getaran
-if SENSOR == "ADXL345":
-    ADDR = 0x53
-    ODR = {100: 0x0A, 200: 0x0B, 400: 0x0C, 800: 0x0D, 1600: 0x0E, 3200: 0x0F}
+# ===================== PENGECEKAN & DETEKSI SENSOR =====================
+sensor_vibr_ok = False
+sensor_temp_ok = False
+ADDR = 0x53 if SENSOR == "ADXL345" else 0x68
+SKALA = 0.0039 * G if SENSOR == "ADXL345" else (4.0 * G) / 32768.0
+REG, FMT = (0x32, '<hhh') if SENSOR == "ADXL345" else (0x3B, '>hhh')
+
+# 1. Pengecekan Sensor Getaran (ADXL345 / MPU-6050)
+try:
+    devs = i2c.scan()
+    if SENSOR == "ADXL345":
+        for a in [0x53, 0x1D]:
+            if a in devs:
+                try:
+                    dev_id = i2c.readfrom_mem(a, 0x00, 1)[0]
+                    if dev_id == 0xE5:
+                        ADDR = a
+                        sensor_vibr_ok = True
+                        break
+                except Exception:
+                    pass
+        if sensor_vibr_ok:
+            ODR = {100: 0x0A, 200: 0x0B, 400: 0x0C, 800: 0x0D, 1600: 0x0E, 3200: 0x0F}
+            i2c.writeto_mem(ADDR, 0x2C, bytes([ODR.get(FS_TARGET * 2, 0x0D)]))
+            i2c.writeto_mem(ADDR, 0x31, b'\x0B')  # Full resolution +/- 16g
+            i2c.writeto_mem(ADDR, 0x2D, b'\x08')  # Measure mode
+            print(f"[HW OK] Sensor ADXL345 terdeteksi di alamat I2C 0x{ADDR:02X}")
+        else:
+            print("[HW FAIL] Sensor ADXL345 TIDAK TERDETEKSI di I2C (0x53 / 0x1D)!")
+    else:  # MPU-6050 (Wokwi / Fallback)
+        if 0x68 in devs or 0x69 in devs:
+            ADDR = 0x68 if 0x68 in devs else 0x69
+            i2c.writeto_mem(ADDR, 0x6B, b'\x00')
+            i2c.writeto_mem(ADDR, 0x1C, b'\x08')
+            sensor_vibr_ok = True
+            print(f"[HW OK] Sensor MPU-6050 terdeteksi di alamat I2C 0x{ADDR:02X}")
+        else:
+            print("[HW FAIL] Sensor MPU-6050 TIDAK TERDETEKSI di I2C (0x68)!")
+except Exception as e:
+    print("[HW WARN] Gagal inisialisasi sensor getaran:", e)
+
+# 2. Pengecekan Sensor Suhu DS18B20 (OneWire)
+ow = onewire.OneWire(Pin(PIN_DS))
+ds = ds18x20.DS18X20(ow)
+roms = []
+try:
+    for _ in range(3):
+        roms = ds.scan()
+        if roms:
+            sensor_temp_ok = True
+            print(f"[HW OK] Sensor DS18B20 terdeteksi ({len(roms)} sensor di GP{PIN_DS})")
+            break
+        time.sleep_ms(100)
+    if not sensor_temp_ok:
+        print(f"[HW FAIL] Sensor DS18B20 TIDAK TERDETEKSI di GP{PIN_DS}!")
+except Exception as e:
+    print("[HW WARN] Gagal memindai DS18B20:", e)
+
+# 3. Prompt Peringatan di LCD jika Sensor Tidak Terdeteksi
+if not sensor_vibr_ok or not sensor_temp_ok:
+    # Bip peringatan (2x bip pendek)
     try:
-        i2c.writeto_mem(ADDR, 0x2C, bytes([ODR.get(FS_TARGET * 2, 0x0D)]))
-        i2c.writeto_mem(ADDR, 0x31, b'\x0B')
-        i2c.writeto_mem(ADDR, 0x2D, b'\x08')
+        set_buzzer(True)
+        time.sleep_ms(80)
+        set_buzzer(False)
+        time.sleep_ms(80)
+        set_buzzer(True)
+        time.sleep_ms(80)
+        set_buzzer(False)
     except Exception:
         pass
-    SKALA = 0.0039 * G
-    REG, FMT = 0x32, '<hhh'
-else:  # MPU6050
-    ADDR = 0x68
-    try:
-        i2c.writeto_mem(ADDR, 0x6B, b'\x00')
-        i2c.writeto_mem(ADDR, 0x1C, b'\x08')   # +-4 g range
-    except Exception:
-        pass
-    SKALA = (4.0 * G) / 32768.0
-    REG, FMT = 0x3B, '>hhh'
 
-# Offset kalibrasi sensor getaran (dimuat otomatis dari calib_adxl.json jika ada)
+    if not sensor_vibr_ok and not sensor_temp_ok:
+        err_l1, err_l2 = "ERR: NO SENSORS!", "CEK ADXL & DS18!"
+        print("[LCD PROMPT] ERR: SENSOR HILANG! Cek kabel ADXL345 (I2C) & DS18B20 (GP16).")
+    elif not sensor_vibr_ok:
+        tag_v = "ADXL345" if SENSOR == "ADXL345" else "MPU-6050"
+        err_l1, err_l2 = f"ERR: NO {tag_v[:7]}!", "CEK KABEL I2C!"
+        print(f"[LCD PROMPT] ERR: NO {tag_v}! Cek kabel I2C SDA(GP20) & SCL(GP21).")
+    else:
+        err_l1, err_l2 = "ERR: NO DS18B20!", "CEK KABEL DATA!"
+        print("[LCD PROMPT] ERR: NO DS18B20! Cek kabel DQ(GP16) & Resistor Pull-up 4.7k.")
+
+    if lcd:
+        lcd.write_lines(err_l1, err_l2)
+    time.sleep(3)  # Tampilkan prompt peringatan selama 3 detik di LCD
+
+# ===================== KALIBRASI 1X OTOMATIS =====================
 OFFSET_X, OFFSET_Y, OFFSET_Z = 0.0, 0.0, 0.0
+
+# Muat kalibrasi sebelumnya jika ada
 try:
     with open("calib_adxl.json", "r") as _f:
         _cal = json.load(_f)
         OFFSET_X = _cal.get("offset_x_ms2", 0.0)
         OFFSET_Y = _cal.get("offset_y_ms2", 0.0)
         OFFSET_Z = _cal.get("offset_z_ms2", 0.0)
-        print(f"[CALIB] Offset kalibrasi ADXL345 aktif: X={OFFSET_X:+.3f}, Y={OFFSET_Y:+.3f}, Z={OFFSET_Z:+.3f} m/s^2")
+        print(f"[CALIB LOAD] Offset tersimpan: X={OFFSET_X:+.3f}, Y={OFFSET_Y:+.3f}, Z={OFFSET_Z:+.3f} m/s^2")
 except Exception:
     pass
 
+def kalibrasi_otomatis_1x(n_sampel=60):
+    """Menjalankan kalibrasi offset otomatis 1x saat booting (posisi diam & rata)"""
+    global OFFSET_X, OFFSET_Y, OFFSET_Z
+    if not sensor_vibr_ok:
+        print("[KALIB] Dilewati: Sensor getaran belum terdeteksi.")
+        return
+
+    tag = "ADXL" if SENSOR == "ADXL345" else "MPU"
+    if lcd:
+        lcd.write_lines(f"KALIBRASI {tag}...", "POSISI DIAM...")
+    print(f"\n[KALIBRASI] Menjalankan kalibrasi 1x {tag} ({n_sampel} sampel)...")
+    print("[KALIBRASI] Pastikan sensor berada pada posisi diam & datar.")
+
+    time.sleep_ms(300)
+    sx = sy = sz = 0.0
+    valid = 0
+    for i in range(n_sampel):
+        try:
+            d = i2c.readfrom_mem(ADDR, REG, 6)
+            rx, ry, rz = struct.unpack(FMT, d)
+            sx += rx * SKALA
+            sy += ry * SKALA
+            sz += rz * SKALA
+            valid += 1
+        except Exception:
+            pass
+        time.sleep_ms(15)
+
+    if valid >= 10:
+        mean_x = sx / valid
+        mean_y = sy / valid
+        mean_z = sz / valid
+
+        # Target diam datar: X = 0, Y = 0, Z = +1g (9.80665 m/s^2)
+        OFFSET_X = mean_x - 0.0
+        OFFSET_Y = mean_y - 0.0
+        OFFSET_Z = mean_z - (1.0 * G)
+
+        print(f"[KALIBRASI OK] Offset Baru: X={OFFSET_X:+.3f}, Y={OFFSET_Y:+.3f}, Z={OFFSET_Z:+.3f} m/s^2")
+
+        try:
+            with open("calib_adxl.json", "w") as f:
+                json.dump({
+                    "offset_x_ms2": round(OFFSET_X, 4),
+                    "offset_y_ms2": round(OFFSET_Y, 4),
+                    "offset_z_ms2": round(OFFSET_Z, 4),
+                    "sensor": SENSOR,
+                    "timestamp": time.time()
+                }, f)
+            print("[KALIBRASI] Parameter kalibrasi disimpan ke 'calib_adxl.json'")
+        except Exception:
+            pass
+
+        if lcd:
+            lcd.write_lines("KALIBRASI OK!", "OFFSET TERSIMPAN")
+        time.sleep_ms(1200)
+
+# Jalankan kalibrasi 1x saat booting
+kalibrasi_otomatis_1x(n_sampel=60)
+
 def baca_xyz():
+    global sensor_vibr_ok
     try:
         d = i2c.readfrom_mem(ADDR, REG, 6)
         x, y, z = struct.unpack(FMT, d)
         ax = (x * SKALA) - OFFSET_X
         ay = (y * SKALA) - OFFSET_Y
         az = (z * SKALA) - OFFSET_Z
+        sensor_vibr_ok = True
         return ax, ay, az
     except Exception:
+        sensor_vibr_ok = False
         return 0.0, 0.0, 1.0 * G
-
-# DS18B20
-ow = onewire.OneWire(Pin(PIN_DS))
-ds = ds18x20.DS18X20(ow)
-try:
-    roms = ds.scan()
-except Exception:
-    roms = []
 
 # ===================== FFT RADIX-2 =====================
 COS = [math.cos(2 * math.pi * k / N) for k in range(N // 2)]
@@ -381,7 +503,7 @@ while True:
     ax, ay, az, fs = ambil_sampel()
 
     suhu = 27.0
-    if roms:
+    if roms and sensor_temp_ok:
         sisa = 300 - time.ticks_diff(time.ticks_ms(), t_konv)
         if sisa > 0:
             time.sleep_ms(sisa)
@@ -389,6 +511,16 @@ while True:
             val = ds.read_temp(roms[0])
             if val is not None and -50.0 < val < 130.0:
                 suhu = val
+            else:
+                sensor_temp_ok = False
+        except Exception:
+            sensor_temp_ok = False
+    elif not roms:
+        try:
+            roms = ds.scan()
+            if roms:
+                sensor_temp_ok = True
+                print(f"[RECONNECT] Sensor DS18B20 terhubung kembali ({len(roms)} sensor)")
         except Exception:
             pass
 
@@ -401,8 +533,18 @@ while True:
     is_vibr_alarm = (rms_total >= RMS_ALARM_THRESHOLD) or (peak_total >= PEAK_ALARM_THRESHOLD)
     alarm_active  = is_temp_alarm or is_vibr_alarm
 
-    # Evaluasi Pesan Status Berdasarkan Ambang Batas (Threshold)
-    if is_vibr_alarm and is_temp_alarm:
+    # Evaluasi Pesan Status Berdasarkan Ambang Batas (Threshold) & Kondisi Sensor
+    if not sensor_vibr_ok and not sensor_temp_ok:
+        status_str = "ERR: SENSOR HILANG!"
+        line1_lcd, line2_lcd = "ERR: NO SENSORS!", "CEK ADXL & DS18!"
+    elif not sensor_vibr_ok:
+        tag_v = "ADXL" if SENSOR == "ADXL345" else "MPU"
+        status_str = f"ERR: NO {tag_v}!"
+        line1_lcd, line2_lcd = f"ERR: NO {tag_v}!", f"T:{suhu:.1f}C R:ERR"
+    elif not sensor_temp_ok:
+        status_str = "ERR: NO DS18B20!"
+        line1_lcd, line2_lcd = "ERR: NO DS18B20!", f"T:ERR R:{rms_total/G:.2f}g"
+    elif is_vibr_alarm and is_temp_alarm:
         status_str = "ALAT BERGETAR & PANAS! RUSAK!!!"
         line1_lcd, line2_lcd = "ALAT BERGETAR &", "PANAS! RUSAK!!!"
     elif is_vibr_alarm:
