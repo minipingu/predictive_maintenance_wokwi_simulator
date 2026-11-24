@@ -352,24 +352,27 @@ Jika Anda ingin memantau grafik streaming real-time sumbu X, Y, Z atau menuliska
 
 ### Langkah 6: Konfigurasi & Menjalankan `main.py` Secara Otomatis (Autostart 24/7)
 
-Setelah sensor terkalibrasi, sistem siap dijalankan untuk pemantauan mesin bor duduk secara penuh:
+Program [main.py](main.py) telah dilengkapi fitur **Dual-Mode Auto-Detection (`SENSOR = "AUTO"`)**:
+* **Saat dijalankan di Simulator Wokwi:** Mendeteksi chip MPU-6050 (`0x68`) $\rightarrow$ otomatis beralih ke mode simulasi (`SIM_GETAR = True`, `REMOVE_DC = False`) agar slider kanvas Wokwi langsung merespons.
+* **Saat dijalankan di Board Fisik Raspberry Pi Pico:** Mendeteksi modul ADXL345 (`0x53`/`0x1D`) $\rightarrow$ otomatis beralih ke mode sensor fisik murni (`SIM_GETAR = False`, `REMOVE_DC = True`), mengaktifkan filter DC gravitasi dan pembacaan getaran nyata mesin bor.
 
-1. Buka berkas [main.py](main.py) di Thonny IDE.
-2. Sesuaikan konfigurasi pada baris 15–28 untuk mode hardware nyata:
+Anda **tidak perlu lagi repot mengubah kode** saat berpindah dari Wokwi ke Raspberry Pi Pico fisik! Cukup sesuaikan kredensial WiFi dan ThingsBoard:
+
+1. Buka berkas [main.py](main.py) di VS Code atau Thonny IDE.
+2. Periksa konfigurasi pada baris 16–47:
    ```python
-   # ===================== KONFIGURASI HARDWARE FISIK =====================
-   SENSOR    = "ADXL345"       # Gunakan driver sensor ADXL345 fisik
-   SIM_GETAR = False           # Nonaktifkan generator getaran sintetis Wokwi
-   REMOVE_DC = True            # Aktifkan filter DC untuk menghilangkan bias 1g gravitasi bumi
+   # ===================== KONFIGURASI CERDAS =====================
+   SENSOR    = "AUTO"      # Otomatis: ADXL345 di board fisik, MPU6050 di Wokwi
+   SIM_GETAR = None        # Otomatis disesuaikan oleh deteksi sensor
+   REMOVE_DC = None        # Otomatis disesuaikan oleh deteksi sensor
 
    # WiFi & ThingsBoard EU
    WIFI_SSID = "Nama_Hotspot_Anda"      # Ganti dengan SSID WiFi Anda
    WIFI_PASS = "Password_WiFi_Anda"     # Ganti dengan Password WiFi Anda
    TB_TOKEN  = "4M6BoXXbvLbZ5MzS56NS"   # Token perangkat ThingsBoard EU
    ```
-3. Klik menu **File** $\rightarrow$ **Save as...** $\rightarrow$ Pilih **Raspberry Pi Pico**.
-4. Beri nama berkas tepat **`main.py`** dan klik **OK**.
-5. Program akan otomatis berjalan setiap kali Raspberry Pi Pico dinyalakan atau diberi daya dari kabel USB / charger 5V mesin bor tanpa memerlukan koneksi PC!
+3. Unggah ke flash Pico menggunakan VS Code (**`MicroPico: Upload project to Pico`**) atau simpan sebagai `main.py` di Thonny IDE.
+4. Program akan otomatis berjalan setiap kali Raspberry Pi Pico dinyalakan atau diberi daya dari kabel USB / charger 5V mesin bor tanpa memerlukan PC!
 
 ## 🍓 4. Panduan Detail Menjalankan di Raspberry Pi 4 (Hardware Fisik)
 

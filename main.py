@@ -14,9 +14,10 @@ import network, socket
 from array import array
 
 # ===================== KONFIGURASI =====================
-SENSOR    = "MPU6050"   # "MPU6050" (Wokwi) atau "ADXL345" (Hardware Fisik)
-SIM_GETAR = True        # True = getaran dinamis Wokwi. Hardware fisik: False
-REMOVE_DC = False       # False di Wokwi agar slider langsung terbaca sebagai getaran!
+SENSOR    = "AUTO"      # "AUTO" = deteksi cerdas otomatis (ADXL345 di Hardware Fisik, MPU6050 di Simulator Wokwi)
+                        # Pilihan manual jika ingin mengunci: "ADXL345" atau "MPU6050"
+SIM_GETAR = None        # None = otomatis (False jika ADXL fisik, True jika simulasi Wokwi)
+REMOVE_DC = None        # None = otomatis (True jika ADXL fisik, False jika simulasi Wokwi)
 FS_TARGET = 200         # Laju sampling (Hz)
 N         = 256         # Jumlah sampel per jendela FFT (pangkat 2)
 G         = 9.80665     # 1 g dalam m/s^2
@@ -131,41 +132,70 @@ if lcd:
 # ===================== PENGECEKAN & DETEKSI SENSOR =====================
 sensor_vibr_ok = False
 sensor_temp_ok = False
-ADDR = 0x53 if SENSOR == "ADXL345" else 0x68
-SKALA = 0.0039 * G if SENSOR == "ADXL345" else (4.0 * G) / 32768.0
-REG, FMT = (0x32, '<hhh') if SENSOR == "ADXL345" else (0x3B, '>hhh')
+ADDR = 0x53
+SKALA = 0.0039 * G
+REG, FMT = 0x32, '<hhh'
 
-# 1. Pengecekan Sensor Getaran (ADXL345 / MPU-6050)
+# 1. Pengecekan & Deteksi Sensor Getaran (ADXL345 Fisik vs MPU-6050 Wokwi)
 try:
     devs = i2c.scan()
-    if SENSOR == "ADXL345":
+    detected_type = None
+
+    # a. Cek apakah ada ADXL345 fisik di bus I2C (0x53 atau 0x1D)
+    if SENSOR in ("AUTO", "ADXL345"):
         for a in [0x53, 0x1D]:
             if a in devs:
                 try:
                     dev_id = i2c.readfrom_mem(a, 0x00, 1)[0]
                     if dev_id == 0xE5:
                         ADDR = a
-                        sensor_vibr_ok = True
+                        detected_type = "ADXL345"
                         break
                 except Exception:
                     pass
-        if sensor_vibr_ok:
-            ODR = {100: 0x0A, 200: 0x0B, 400: 0x0C, 800: 0x0D, 1600: 0x0E, 3200: 0x0F}
-            i2c.writeto_mem(ADDR, 0x2C, bytes([ODR.get(FS_TARGET * 2, 0x0D)]))
-            i2c.writeto_mem(ADDR, 0x31, b'\x0B')  # Full resolution +/- 16g
-            i2c.writeto_mem(ADDR, 0x2D, b'\x08')  # Measure mode
-            print(f"[HW OK] Sensor ADXL345 terdeteksi di alamat I2C 0x{ADDR:02X}")
-        else:
-            print("[HW FAIL] Sensor ADXL345 TIDAK TERDETEKSI di I2C (0x53 / 0x1D)!")
-    else:  # MPU-6050 (Wokwi / Fallback)
-        if 0x68 in devs or 0x69 in devs:
-            ADDR = 0x68 if 0x68 in devs else 0x69
-            i2c.writeto_mem(ADDR, 0x6B, b'\x00')
-            i2c.writeto_mem(ADDR, 0x1C, b'\x08')
-            sensor_vibr_ok = True
-            print(f"[HW OK] Sensor MPU-6050 terdeteksi di alamat I2C 0x{ADDR:02X}")
-        else:
-            print("[HW FAIL] Sensor MPU-6050 TIDAK TERDETEKSI di I2C (0x68)!")
+
+    # b. Jika ADXL345 tidak ada, cek apakah ada MPU-6050 (Wokwi / 0x68 / 0x69)
+    if not detected_type and SENSOR in ("AUTO", "MPU6050"):
+        for a in [0x68, 0x69]:
+            if a in devs:
+                ADDR = a
+                detected_type = "MPU6050"
+                break
+
+    # Konfigurasi parameter operasional berdasarkan sensor yang terdeteksi
+    if detected_type == "ADXL345":
+        SENSOR = "ADXL345"
+        sensor_vibr_ok = True
+        ADDR = ADDR if ADDR in [0x53, 0x1D] else 0x53
+        SKALA = 0.0039 * G
+        REG, FMT = 0x32, '<hhh'
+        ODR = {100: 0x0A, 200: 0x0B, 400: 0x0C, 800: 0x0D, 1600: 0x0E, 3200: 0x0F}
+        i2c.writeto_mem(ADDR, 0x2C, bytes([ODR.get(FS_TARGET * 2, 0x0D)]))
+        i2c.writeto_mem(ADDR, 0x31, b'\x0B')  # Full resolution +/- 16g
+        i2c.writeto_mem(ADDR, 0x2D, b'\x08')  # Measure mode
+        if SIM_GETAR is None: SIM_GETAR = False  # Hardware fisik: baca getaran nyata mesin bor
+        if REMOVE_DC is None: REMOVE_DC = True   # Filter DC aktif untuk hilangkan 1g gravitasi
+        print(f"[HW OK] Terdeteksi Hardware Fisik: ADXL345 di I2C 0x{ADDR:02X} (SIM_GETAR={SIM_GETAR}, REMOVE_DC={REMOVE_DC})")
+
+    elif detected_type == "MPU6050":
+        SENSOR = "MPU6050"
+        sensor_vibr_ok = True
+        ADDR = ADDR if ADDR in [0x68, 0x69] else 0x68
+        SKALA = (4.0 * G) / 32768.0
+        REG, FMT = 0x3B, '>hhh'
+        i2c.writeto_mem(ADDR, 0x6B, b'\x00')  # Bangunkan MPU6050 dari sleep
+        i2c.writeto_mem(ADDR, 0x1C, b'\x08')  # Range +/- 4g
+        if SIM_GETAR is None: SIM_GETAR = True   # Mode Wokwi: getaran sintetis aktif
+        if REMOVE_DC is None: REMOVE_DC = False  # Mode Wokwi: slider Wokwi langsung terbaca
+        print(f"[WOKWI OK] Terdeteksi Simulator Wokwi: MPU-6050 di I2C 0x{ADDR:02X} (SIM_GETAR={SIM_GETAR}, REMOVE_DC={REMOVE_DC})")
+
+    else:
+        # Jika tidak terdeteksi sama sekali
+        sensor_vibr_ok = False
+        if SENSOR == "AUTO": SENSOR = "ADXL345"  # Asumsikan target fisik adalah ADXL345
+        if SIM_GETAR is None: SIM_GETAR = False
+        if REMOVE_DC is None: REMOVE_DC = True
+        print("[HW FAIL] Tidak ada sensor getaran (ADXL345 / MPU-6050) terdeteksi di bus I2C!")
 except Exception as e:
     print("[HW WARN] Gagal inisialisasi sensor getaran:", e)
 
@@ -590,7 +620,8 @@ while True:
         "alarm": alarm_active,
         "status_alarm": status_str,
         "pesan_status": status_str,
-        "status": status_str
+        "status": status_str,
+        "sensor_vibr": SENSOR
     }
     kirim_tb(data)
     print()
