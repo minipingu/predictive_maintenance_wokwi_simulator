@@ -242,9 +242,9 @@ buzzer = BuzzerController(
 # THRESHOLD PREDICTIVE MAINTENANCE
 # =====================================
 
-RMS_THRESHOLD = 3.0
-PEAK_THRESHOLD = 3.0
-TEMP_THRESHOLD = 27.0
+RMS_THRESHOLD = 5.0
+PEAK_THRESHOLD = 10.0
+TEMP_THRESHOLD = 40.0
 
 
 # =====================================
