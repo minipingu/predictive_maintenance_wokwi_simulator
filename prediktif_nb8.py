@@ -24,11 +24,16 @@ from typing import Callable, Optional, Tuple
 BUZZER_PIN = 17
 
 # Mode buzzer:
-# - "AUTO"    : Bergantian PWM 2000 Hz (untuk Buzzer Pasif) & DC HIGH (untuk Buzzer Aktif)
-#               sehingga PASTI berbunyi pada kedua jenis buzzer!
-# - "PASSIVE" : PWM Sirine Ambulans 960 Hz <-> 770 Hz (khusus Buzzer Pasif)
-# - "ACTIVE"  : Pulsa DC HIGH/LOW (khusus Buzzer Aktif)
-BUZZER_MODE = "AUTO"
+# - "AMBULANCE" : PWM Sirine Ambulans dua nada 960 Hz <-> 770 Hz (rekomendasi untuk buzzer pasif)
+# - "PASSIVE"   : Sama dengan "AMBULANCE" (PWM 960 Hz <-> 770 Hz)
+# - "AUTO"      : Bergantian PWM sirine & DC HIGH (untuk deteksi ganda pasif/aktif)
+# - "ACTIVE"    : Pulsa DC HIGH/LOW (khusus buzzer aktif)
+BUZZER_MODE = "AMBULANCE"
+
+# Frekuensi sirine ambulans (Dua Nada Hi-Lo)
+NADA_AMBULANCE_HI = 960   # Hz (Nada tinggi "Nee")
+NADA_AMBULANCE_LO = 770   # Hz (Nada rendah "Naw")
+DURASI_NADA_AMBULANCE = 0.35  # Detik per nada
 
 # Ubah ke True jika modul buzzer 3-pin Anda bertipe Active-LOW (berbunyi saat diberi LOW)
 BUZZER_ACTIVE_LOW = False
@@ -43,7 +48,7 @@ class BuzzerController:
     def __init__(
         self,
         pin: int,
-        mode: str = "AUTO",
+        mode: str = "AMBULANCE",
         active_low: bool = False,
         test_startup: bool = False,
     ) -> None:
@@ -56,7 +61,7 @@ class BuzzerController:
         self._stop_event = threading.Event()
         self._wake_event = threading.Event()
         self._pwm = None
-        self._pwm_supported = self.mode in ("AUTO", "PASSIVE")
+        self._pwm_supported = self.mode in ("AMBULANCE", "PASSIVE", "AUTO")
         self._is_silent = False
         self._thread: Optional[threading.Thread] = None
 
@@ -148,9 +153,9 @@ class BuzzerController:
     def startup_test(self) -> None:
         """Bunyi tes singkat 1x saat boot jika BUZZER_TEST_STARTUP=True."""
         try:
-            self._set_tone(2000, 50.0)
+            self._set_tone(NADA_AMBULANCE_HI, 50.0)
             time.sleep(0.15)
-            self._set_dc(True)
+            self._set_tone(NADA_AMBULANCE_LO, 50.0)
             time.sleep(0.15)
         finally:
             self._silence()
@@ -188,35 +193,38 @@ class BuzzerController:
                 self._wake_event.clear()
                 continue
 
-            if self.mode == "PASSIVE":
-                # Pola sirine ambulans dua nada (960 Hz <-> 770 Hz)
-                self._set_tone(960, 50.0)
-                if self._wait_step(0.32):
+            if self.mode in ("AMBULANCE", "PASSIVE"):
+                # Sirine ambulans dua nada kontinyu (960 Hz "Nee" <-> 770 Hz "Naw")
+                self._set_tone(NADA_AMBULANCE_HI, 50.0)
+                if self._wait_step(DURASI_NADA_AMBULANCE):
                     continue
-                self._set_tone(770, 50.0)
-                self._wait_step(0.32)
+                self._set_tone(NADA_AMBULANCE_LO, 50.0)
+                self._wait_step(DURASI_NADA_AMBULANCE)
             elif self.mode == "ACTIVE":
-                # Pulsa DC tegas untuk buzzer aktif
+                # Pulsa DC cepat menyerupai sirine untuk buzzer aktif
                 self._set_dc(True)
-                if self._wait_step(0.35):
+                if self._wait_step(0.25):
                     continue
                 with self._hw_lock:
                     GPIO.output(self.pin, self._off_level())
-                self._wait_step(0.15)
+                self._wait_step(0.12)
             else:
-                # Mode AUTO: Fase PWM (bunyikan Pasif) + Fase DC HIGH (bunyikan Aktif)
-                self._set_tone(2000, 50.0)
-                if self._wait_step(0.22):
+                # Mode AUTO: Sirine PWM (Pasif) + Pulsa DC HIGH (Aktif)
+                self._set_tone(NADA_AMBULANCE_HI, 50.0)
+                if self._wait_step(0.25):
+                    continue
+                self._set_tone(NADA_AMBULANCE_LO, 50.0)
+                if self._wait_step(0.25):
                     continue
                 self._set_dc(True)
-                if self._wait_step(0.22):
+                if self._wait_step(0.15):
                     continue
                 with self._hw_lock:
                     if self._pwm is not None:
                         self._pwm.ChangeDutyCycle(100 if self.active_low else 0)
                     else:
                         GPIO.output(self.pin, self._off_level())
-                self._wait_step(0.10)
+                self._wait_step(0.08)
 
     def cleanup(self) -> None:
         self._stop_event.set()
@@ -513,8 +521,28 @@ def init_lcd(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Option
         return None
 
 
-def format_lcd_lines(suhu: Optional[float], rms_total: float) -> Tuple[str, str]:
-    """Format nilai suhu dan RMS total agar pas di layar 16x2."""
+def format_lcd_lines(
+    suhu: Optional[float],
+    rms_total: float,
+    peak_total: float = 0.0,
+    peak_alert: bool = False,
+    rms_warning: bool = False,
+    temp_alert: bool = False,
+) -> Tuple[str, str]:
+    """Format status alarm/warning atau suhu & RMS agar pas di layar 16x2."""
+    suhu_txt = "{:.1f}C".format(suhu) if suhu is not None else "ERR"
+
+    if peak_alert and temp_alert:
+        return "BERGETAR KENCANG", "& SUHU TINGGI!"
+    if peak_alert:
+        return "BERGETAR KENCANG", "P:{:.1f} R:{:.1f}".format(peak_total, rms_total)
+    if rms_warning and temp_alert:
+        return "WARN:RMS & PANAS", "R:{:.2f} S:{}".format(rms_total, suhu_txt)
+    if rms_warning:
+        return "WARN: RMS TINGGI", "R:{:.2f} S:{}".format(rms_total, suhu_txt)
+    if temp_alert:
+        return "SUHU TINGGI!", "S:{} R:{:.2f}".format(suhu_txt, rms_total)
+
     if suhu is not None:
         line1: str = "Suhu:{:6.2f} C".format(suhu)
     else:
@@ -1001,11 +1029,9 @@ try:
 
         alerts = []
 
-        # Pengecekan getaran
-        vib_alert = (
-            rms_total > RMS_THRESHOLD or
-            peak_total > PEAK_THRESHOLD
-        )
+        # Pengecekan getaran (dipisah: peak_total memicu buzzer, rms_total hanya warning tanpa buzzer)
+        peak_alert = peak_total > PEAK_THRESHOLD
+        rms_warning = rms_total > RMS_THRESHOLD
 
         # Pengecekan suhu
         temp_alert = (
@@ -1013,9 +1039,13 @@ try:
             suhu > TEMP_THRESHOLD
         )
 
-        if vib_alert:
+        if peak_alert:
 
-            alerts.append("GETARAN TIDAK NORMAL!")
+            alerts.append("BERGETAR KENCANG!")
+
+        if rms_warning:
+
+            alerts.append("WARNING: GETARAN RMS TINGGI!")
 
         if temp_alert:
 
@@ -1026,7 +1056,7 @@ try:
         # =====================================
 
         with alert_lock:
-            vib_alert_state = vib_alert
+            vib_alert_state = peak_alert
             temp_alert_state = temp_alert
 
         alert_status = evaluate_and_drive_buzzer()
@@ -1086,6 +1116,8 @@ try:
         print("\n--- PREDICTIVE MAINTENANCE ALERT ---")
 
         print("Alert Status  :", alert_status)
+        print("RMS Warning   :", rms_warning)
+        print("Peak Alert    :", peak_alert)
         print("Alert Message :", alert_message)
         idle_level_str = "HIGH" if BUZZER_ACTIVE_LOW else "LOW"
         print(
@@ -1104,7 +1136,14 @@ try:
 
         if lcd is not None:
             try:
-                baris1, baris2 = format_lcd_lines(suhu, rms_total)
+                baris1, baris2 = format_lcd_lines(
+                    suhu,
+                    rms_total,
+                    peak_total=peak_total,
+                    peak_alert=peak_alert,
+                    rms_warning=rms_warning,
+                    temp_alert=temp_alert,
+                )
                 lcd.display_lines(baris1, baris2)
                 print("Status LCD : TERHUBUNG ({})".format(hex(lcd.address)))
                 print("Baris 1    :", baris1)
@@ -1121,6 +1160,8 @@ try:
         attr_payload = {
 
             "alert_status": alert_status,
+
+            "warning_status": rms_warning,
 
             "alert_message": alert_message
 
