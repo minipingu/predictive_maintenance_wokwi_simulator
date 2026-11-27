@@ -31,7 +31,7 @@ GPIO.output(BUZZER_PIN, GPIO.LOW)
 
 RMS_THRESHOLD = 5.0
 PEAK_THRESHOLD = 10.0
-TEMP_THRESHOLD = 30.0
+TEMP_THRESHOLD = 40.0
 
 
 # =====================================
