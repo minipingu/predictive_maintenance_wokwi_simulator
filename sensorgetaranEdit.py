@@ -141,20 +141,65 @@ def kirim_mqtt(topic, data):
 
 
 # =====================================
-# KONFIGURASI DAN DRIVER OLED SH1106 128x64
+# KONFIGURASI DAN DRIVER OLED SSD1306 / SH1106 128x64
 # =====================================
 
+# Pilih chipset panel OLED: "SSD1306" (umum 0.96") atau "SH1106" (umum 1.3")
+OLED_CHIP: str = "SSD1306"
 # Isi None untuk deteksi otomatis (0x3C / 0x3D), atau isi eksplisit misal 0x3C
 OLED_I2C_ADDR: Optional[int] = None
 OLED_CANDIDATE_ADDRS: Tuple[int, ...] = (0x3C, 0x3D)
 OLED_WIDTH: int = 128
 OLED_HEIGHT: int = 64
 OLED_PAGES: int = 8
-OLED_COL_OFFSET: int = 2
 OLED_COLS: int = 21
 OLED_ROWS: int = 8
 
-# Font bitmap 5x7 kolom-per-byte (LSB di atas) untuk tampilan teks 21x8 pada SH1106
+_OLED_CHIP_PROFILES = {
+    "SSD1306": {
+        "col_offset": 0,
+        "init_cmds": (
+            0xAE,        # Display OFF
+            0xD5, 0x80,  # Set display clock divide ratio/oscillator freq
+            0xA8, 0x3F,  # Set multiplex ratio (1..64)
+            0xD3, 0x00,  # Display offset = 0
+            0x40,        # Display start line = 0
+            0x8D, 0x14,  # Enable charge pump (wajib agar OLED SSD1306 menyala)
+            0x20, 0x02,  # Page addressing mode (wajib untuk perintah 0xB0..0xB7)
+            0xA1,        # Segment re-map (col 127 -> SEG0)
+            0xC8,        # COM scan direction remapped
+            0xDA, 0x12,  # COM pins hardware configuration (128x64)
+            0x81, 0xCF,  # Contrast control
+            0xD9, 0xF1,  # Pre-charge period (SSD1306 internal charge pump)
+            0xDB, 0x40,  # VCOMH deselect level
+            0xA4,        # Output follows RAM content
+            0xA6,        # Normal (non-inverted) display
+            0x2E,        # Nonaktifkan scroll
+        ),
+    },
+    "SH1106": {
+        "col_offset": 2,
+        "init_cmds": (
+            0xAE,        # Display OFF
+            0xD5, 0x80,  # Set display clock divide ratio/oscillator freq
+            0xA8, 0x3F,  # Set multiplex ratio (1..64)
+            0xD3, 0x00,  # Display offset = 0
+            0x40,        # Display start line = 0
+            0xAD, 0x8B,  # Internal DC-DC enable (SH1106)
+            0xA1,        # Segment re-map (col 127 -> SEG0)
+            0xC8,        # COM scan direction remapped
+            0xDA, 0x12,  # COM pins hardware configuration
+            0x81, 0xCF,  # Contrast control
+            0xD9, 0x22,  # Pre-charge period
+            0xDB, 0x35,  # VCOMH deselect level
+            0xA4,        # Display follows GDDRAM
+            0xA6,        # Normal (non-inverted) display
+        ),
+    },
+}
+OLED_COL_OFFSET: int = _OLED_CHIP_PROFILES[OLED_CHIP]["col_offset"]
+
+# Font bitmap 5x7 kolom-per-byte (LSB di atas) untuk tampilan teks 21x8 pada OLED 128x64
 _FONT_5X7 = {
     " ": (0x00, 0x00, 0x00, 0x00, 0x00),
     "!": (0x00, 0x00, 0x5F, 0x00, 0x00),
@@ -245,19 +290,25 @@ _FONT_5X7 = {
 }
 
 
-class SH1106Oled128x64:
-    """Driver OLED SH1106 128x64 berbasis I2C menggunakan busio.I2C tanpa dependensi eksternal."""
+class OledI2C128x64:
+    """Driver OLED 128x64 (SSD1306 / SH1106) berbasis I2C menggunakan busio.I2C tanpa dependensi eksternal."""
 
     _CTRL_CMD: int = 0x00
     _CTRL_DATA: int = 0x40
     _CMD_NOP: int = 0xE3
-    _DATA_CHUNK: int = 32
+    _DATA_CHUNK: int = 16
 
-    def __init__(self, i2c_bus: busio.I2C, address: int) -> None:
+    def __init__(self, i2c_bus: busio.I2C, address: int, chip: str = OLED_CHIP) -> None:
+        chip_key: str = chip.strip().upper()
+        if chip_key not in _OLED_CHIP_PROFILES:
+            raise ValueError("Chip OLED tidak didukung: {} (pilih SSD1306 atau SH1106)".format(chip))
+        self.chip: str = chip_key
+        profile = _OLED_CHIP_PROFILES[chip_key]
         self._i2c: busio.I2C = i2c_bus
         self.address: int = address
         self._addr: int = address
-        self._col_offset: int = OLED_COL_OFFSET
+        self._col_offset: int = profile["col_offset"]
+        self._init_cmds: Tuple[int, ...] = profile["init_cmds"]
         self._last_pages: Optional[Tuple[bytes, ...]] = None
         self._init_display()
 
@@ -265,7 +316,7 @@ class SH1106Oled128x64:
         deadline: float = time.monotonic() + 1.0
         while not self._i2c.try_lock():
             if time.monotonic() >= deadline:
-                raise RuntimeError("Timeout mengambil kunci bus I2C untuk OLED SH1106.")
+                raise RuntimeError("Timeout mengambil kunci bus I2C untuk OLED {}.".format(self.chip))
             time.sleep(0.001)
 
     def _write_cmds_locked(self, cmds: Tuple[int, ...]) -> None:
@@ -290,26 +341,10 @@ class SH1106Oled128x64:
         return bytes(buf)
 
     def _init_display(self) -> None:
-        init_cmds: Tuple[int, ...] = (
-            0xAE,        # Display OFF
-            0xD5, 0x80,  # Set display clock divide ratio/oscillator freq
-            0xA8, 0x3F,  # Set multiplex ratio (1..64)
-            0xD3, 0x00,  # Display offset = 0
-            0x40,        # Display start line = 0
-            0xAD, 0x8B,  # Internal DC-DC enable (SH1106)
-            0xA1,        # Segment re-map (col 127 -> SEG0)
-            0xC8,        # COM scan direction remapped
-            0xDA, 0x12,  # COM pins hardware configuration
-            0x81, 0xCF,  # Contrast control
-            0xD9, 0x22,  # Pre-charge period
-            0xDB, 0x35,  # VCOMH deselect level
-            0xA4,        # Display follows GDDRAM
-            0xA6,        # Normal (non-inverted) display
-        )
         blank_page = bytes(OLED_WIDTH)
         self._acquire_bus()
         try:
-            self._write_cmds_locked(init_cmds)
+            self._write_cmds_locked(self._init_cmds)
             for page in range(OLED_PAGES):
                 self._write_page_locked(page, blank_page)
             self._write_cmds_locked((0xAF,))  # Display ON
@@ -318,7 +353,7 @@ class SH1106Oled128x64:
             self._i2c.unlock()
 
     def is_connected(self) -> bool:
-        """Periksa apakah panel SH1106 masih merespons ACK pada bus I2C."""
+        """Periksa apakah panel OLED masih merespons ACK pada bus I2C."""
         self._acquire_bus()
         try:
             self._i2c.writeto(self._addr, bytes((self._CTRL_CMD, self._CMD_NOP)))
@@ -329,7 +364,7 @@ class SH1106Oled128x64:
             self._i2c.unlock()
 
     def clear(self) -> None:
-        """Hapus seluruh piksel GDDRAM pada layar OLED SH1106."""
+        """Hapus seluruh piksel GDDRAM pada layar OLED."""
         blank_page = bytes(OLED_WIDTH)
         self._acquire_bus()
         try:
@@ -340,7 +375,7 @@ class SH1106Oled128x64:
             self._i2c.unlock()
 
     def set_power(self, enabled: bool) -> None:
-        """Nyalakan (0xAF) atau matikan (0xAE) panel OLED SH1106."""
+        """Nyalakan (0xAF) atau matikan (0xAE) panel OLED."""
         cmd = 0xAF if enabled else 0xAE
         self._acquire_bus()
         try:
@@ -349,7 +384,7 @@ class SH1106Oled128x64:
             self._i2c.unlock()
 
     def display_lines(self, lines: Tuple[str, ...], force: bool = False) -> None:
-        """Render hingga 8 baris teks (21 karakter/baris) ke SH1106 dan hanya kirim page yang berubah."""
+        """Render hingga 8 baris teks (21 karakter/baris) ke OLED dan hanya kirim page yang berubah."""
         normalized = [
             (lines[i] if i < len(lines) else "")[:OLED_COLS].ljust(OLED_COLS)
             for i in range(OLED_ROWS)
@@ -368,8 +403,12 @@ class SH1106Oled128x64:
             self._i2c.unlock()
 
 
-def init_oled(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Optional[SH1106Oled128x64]:
-    """Deteksi alamat OLED SH1106 I2C, cek koneksi, dan kembalikan instance SH1106Oled128x64 jika tersedia."""
+def init_oled(
+    i2c_bus: busio.I2C,
+    preferred_addr: Optional[int] = None,
+    chip: str = OLED_CHIP,
+) -> Optional[OledI2C128x64]:
+    """Deteksi alamat OLED I2C (SSD1306/SH1106), cek koneksi, dan kembalikan instance OledI2C128x64 jika tersedia."""
     while not i2c_bus.try_lock():
         time.sleep(0.001)
     try:
@@ -391,24 +430,26 @@ def init_oled(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Optio
 
     if target_addr is None:
         print(
-            "Status OLED SH1106 : TIDAK TERHUBUNG (alamat {} tidak ditemukan di bus I2C)".format(
-                [hex(a) for a in OLED_CANDIDATE_ADDRS]
+            "Status OLED {} : TIDAK TERHUBUNG (alamat {} tidak ditemukan di bus I2C)".format(
+                chip,
+                [hex(a) for a in OLED_CANDIDATE_ADDRS],
             )
         )
         return None
 
     try:
-        oled_device: SH1106Oled128x64 = SH1106Oled128x64(i2c_bus, target_addr)
+        oled_device: OledI2C128x64 = OledI2C128x64(i2c_bus, target_addr, chip=chip)
         terhubung: bool = oled_device.is_connected()
         print(
-            "Status OLED SH1106 : {} (alamat {})".format(
+            "Status OLED {} : {} (alamat {})".format(
+                oled_device.chip,
                 "TERHUBUNG" if terhubung else "TIDAK MERESPONS",
                 hex(target_addr),
             )
         )
         return oled_device if terhubung else None
     except Exception as exc:
-        print("Status OLED SH1106 : GAGAL INISIALISASI ({}) - {}".format(hex(target_addr), exc))
+        print("Status OLED {} : GAGAL INISIALISASI ({}) - {}".format(chip, hex(target_addr), exc))
         return None
 
 
@@ -462,7 +503,7 @@ def format_oled_lines(
     alert_status: bool = False,
     alert_message: str = "",
 ) -> Tuple[str, ...]:
-    """Format 8 panel parameter dashboard ThingsBoard menjadi 8 baris OLED SH1106 (maks 21 char/baris)."""
+    """Format 8 panel parameter dashboard ThingsBoard menjadi 8 baris OLED 128x64 (maks 21 char/baris)."""
     row0 = "RX:{} Y:{} Z:{}".format(_fmt_val4(rms_x), _fmt_val4(rms_y), _fmt_val4(rms_z))
     row1 = "RMS Tot:{} m/s2".format(_fmt_val6(rms_total, decimals_small=2))
     row2 = "PX:{} Y:{} Z:{}".format(_fmt_val4(peak_x), _fmt_val4(peak_y), _fmt_val4(peak_z))
@@ -482,7 +523,7 @@ def format_oled_lines(
 # INISIALISASI KOMUNIKASI I2C
 # =====================================
 
-oled: Optional[SH1106Oled128x64] = None
+oled: Optional[OledI2C128x64] = None
 
 try:
 
@@ -491,7 +532,7 @@ try:
         board.SDA
     )
 
-    oled = init_oled(i2c, OLED_I2C_ADDR)
+    oled = init_oled(i2c, OLED_I2C_ADDR, chip=OLED_CHIP)
 
     # =====================================
     # INISIALISASI SENSOR ADXL345
@@ -586,7 +627,7 @@ if oled is not None:
             "sensor...",
         ))
     except Exception as oled_err:
-        print("Gagal menulis ke OLED SH1106:", oled_err)
+        print("Gagal menulis ke OLED {}:".format(oled.chip), oled_err)
 
 total_x = 0.0
 total_y = 0.0
@@ -875,7 +916,7 @@ try:
         print("Alert Status  :", alert_status)
         print("Alert Message :", alert_message)
 
-        print("\n--- OLED SH1106 128x64 ---")
+        print("\n--- OLED {} 128x64 ---".format(oled.chip if oled is not None else OLED_CHIP))
 
         if oled is not None:
             try:
@@ -994,7 +1035,7 @@ except Exception as e:
 finally:
 
     # =====================================
-    # PEMBERSIHAN OLED SH1106 DAN GPIO
+    # PEMBERSIHAN OLED DAN GPIO
     # =====================================
 
     if oled is not None:
