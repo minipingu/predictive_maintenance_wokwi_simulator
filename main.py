@@ -28,16 +28,16 @@ F_SHAFT     = RPM_SPINDLE / 60.0  # Frekuensi fundamental putaran poros (Hz): 15
 F_HARMONIC2 = 2.0 * F_SHAFT       # Harmonik ke-2 (Misalignment belt / pulley bor): 50.0 Hz
 F_BEARING   = 3.1 * F_SHAFT       # Frekuensi cacat lintasan bantalan (BPFO ball bearing 6205): 77.5 Hz
 
-# Ambang Batas Alarm Predictive Maintenance (ISO 10816-3 Mesin Industri Kelas 1/2)
-TEMP_ALARM_THRESHOLD = 50.0        # Ambang batas suhu (°C) - Indikasi degradasi pelumas/gesekan
-RMS_ALARM_THRESHOLD  = 2.50 * G    # 24.52 m/s^2 (setara 2.50 g) - Indikasi kerusakan dinamis
-PEAK_ALARM_THRESHOLD = 4.50 * G    # 44.13 m/s^2 (setara 4.50 g) - Indikasi kejutan impak spalling
+# Ambang Batas Alarm Predictive Maintenance (Disamakan dengan sensorgetaranEdit.py)
+TEMP_ALARM_THRESHOLD = 30.0        # Ambang batas suhu (°C)
+RMS_ALARM_THRESHOLD  = 5.0         # 5.0 m/s^2 (~0.51 g)
+PEAK_ALARM_THRESHOLD = 10.0        # 10.0 m/s^2 (~1.02 g)
 
-# Pinout Raspberry Pi Pico W
-PIN_BZ  = 28            # Buzzer PWM -> GP28
-PIN_DS  = 16            # DS18B20 DQ -> GP16
-PIN_SDA = 20            # I2C0 SDA   -> GP20
-PIN_SCL = 21            # I2C0 SCL   -> GP21
+# Pinout Raspberry Pi Pico W (Mengikuti port GPIO sensorgetaranEdit.py)
+PIN_BZ  = 17            # Buzzer PWM -> GP17 (Pin Fisik 22)
+PIN_DS  = 4             # DS18B20 DQ -> GP4  (Pin Fisik 6)
+PIN_SDA = 2             # I2C1 SDA   -> GP2  (Pin Fisik 4)
+PIN_SCL = 3             # I2C1 SCL   -> GP3  (Pin Fisik 5)
 
 # WiFi & ThingsBoard EU
 WIFI_SSID = "iot_bbpvp"
@@ -119,7 +119,9 @@ class I2cLcd:
             self._last_l2 = s2
 
 # ===================== INISIALISASI I2C & LCD =====================
-i2c = I2C(0, sda=Pin(PIN_SDA), scl=Pin(PIN_SCL), freq=100000)
+# RP2040: GP2/3, GP6/7, GP10/11, GP14/15, GP18/19, GP26/27 menggunakan I2C(1); lainnya I2C(0)
+_I2C_ID = 1 if (PIN_SDA, PIN_SCL) in ((2, 3), (6, 7), (10, 11), (14, 15), (18, 19), (26, 27)) else 0
+i2c = I2C(_I2C_ID, sda=Pin(PIN_SDA), scl=Pin(PIN_SCL), freq=100000)
 
 lcd = None
 try:
@@ -237,14 +239,14 @@ if not sensor_vibr_ok or not sensor_temp_ok:
 
     if not sensor_vibr_ok and not sensor_temp_ok:
         err_l1, err_l2 = "ERR: NO SENSORS!", "CEK ADXL & DS18!"
-        print("[LCD PROMPT] ERR: SENSOR HILANG! Cek kabel ADXL345 (I2C) & DS18B20 (GP16).")
+        print(f"[LCD PROMPT] ERR: SENSOR HILANG! Cek kabel ADXL345 (I2C GP{PIN_SDA}/GP{PIN_SCL}) & DS18B20 (GP{PIN_DS}).")
     elif not sensor_vibr_ok:
         tag_v = "ADXL345" if SENSOR == "ADXL345" else "MPU-6050"
         err_l1, err_l2 = f"ERR: NO {tag_v[:7]}!", "CEK KABEL I2C!"
-        print(f"[LCD PROMPT] ERR: NO {tag_v}! Cek kabel I2C SDA(GP20) & SCL(GP21).")
+        print(f"[LCD PROMPT] ERR: NO {tag_v}! Cek kabel I2C SDA(GP{PIN_SDA}) & SCL(GP{PIN_SCL}).")
     else:
         err_l1, err_l2 = "ERR: NO DS18B20!", "CEK KABEL DATA!"
-        print("[LCD PROMPT] ERR: NO DS18B20! Cek kabel DQ(GP16) & Resistor Pull-up 4.7k.")
+        print(f"[LCD PROMPT] ERR: NO DS18B20! Cek kabel DQ(GP{PIN_DS}) & Resistor Pull-up 4.7k.")
 
     if lcd:
         lcd.write_lines(err_l1, err_l2)
@@ -297,10 +299,10 @@ def kalibrasi_otomatis_1x(n_sampel=60):
         mean_y = sy / valid
         mean_z = sz / valid
 
-        # Target diam datar: X = 0, Y = 0, Z = +1g (9.80665 m/s^2)
-        OFFSET_X = mean_x - 0.0
-        OFFSET_Y = mean_y - 0.0
-        OFFSET_Z = mean_z - (1.0 * G)
+        # Target diam: hilangkan offset & bias gravitasi agar X=0, Y=0, Z=0 m/s^2 (seperti sensorgetaranEdit.py)
+        OFFSET_X = mean_x
+        OFFSET_Y = mean_y
+        OFFSET_Z = mean_z
 
         print(f"[KALIBRASI OK] Offset Baru: X={OFFSET_X:+.3f}, Y={OFFSET_Y:+.3f}, Z={OFFSET_Z:+.3f} m/s^2")
 
@@ -336,7 +338,7 @@ def baca_xyz():
         return ax, ay, az
     except Exception:
         sensor_vibr_ok = False
-        return 0.0, 0.0, 1.0 * G
+        return 0.0, 0.0, 0.0
 
 # ===================== FFT RADIX-2 =====================
 COS = [math.cos(2 * math.pi * k / N) for k in range(N // 2)]
@@ -569,9 +571,9 @@ while True:
     rms_total = r[3]
     peak_total = r[7]
 
-    # Evaluasi Ambang Batas
-    is_temp_alarm = (suhu >= TEMP_ALARM_THRESHOLD)
-    is_vibr_alarm = (rms_total >= RMS_ALARM_THRESHOLD) or (peak_total >= PEAK_ALARM_THRESHOLD)
+    # Evaluasi Ambang Batas (sesuai sensorgetaranEdit.py)
+    is_temp_alarm = (suhu > TEMP_ALARM_THRESHOLD)
+    is_vibr_alarm = (rms_total > RMS_ALARM_THRESHOLD) or (peak_total > PEAK_ALARM_THRESHOLD)
     alarm_active  = is_temp_alarm or is_vibr_alarm
 
     # Evaluasi Pesan Status Berdasarkan Ambang Batas (Threshold) & Kondisi Sensor
@@ -584,7 +586,7 @@ while True:
         line1_lcd, line2_lcd = f"ERR: NO {tag_v}!", f"T:{suhu:.1f}C R:ERR"
     elif not sensor_temp_ok:
         status_str = "ERR: NO DS18B20!"
-        line1_lcd, line2_lcd = "ERR: NO DS18B20!", f"T:ERR R:{rms_total/G:.2f}g"
+        line1_lcd, line2_lcd = "ERR: NO DS18B20!", f"T:ERR R:{rms_total:.2f}"
     elif is_vibr_alarm and is_temp_alarm:
         status_str = "ALAT BERGETAR & PANAS! RUSAK!!!"
         line1_lcd, line2_lcd = "ALAT BERGETAR &", "PANAS! RUSAK!!!"
@@ -596,7 +598,7 @@ while True:
         line1_lcd, line2_lcd = "ALAT PANAS!", "RUSAK"
     else:
         status_str = "NORMAL"
-        line1_lcd, line2_lcd = "STATUS: NORMAL", "T:{:.1f}C R:{:.2f}g".format(suhu, rms_total / G)
+        line1_lcd, line2_lcd = "STATUS: NORMAL", "T:{:.1f}C R:{:.2f}".format(suhu, rms_total)
 
     # Kontrol Tampilan Layar LCD 16x2
     if lcd:
@@ -609,9 +611,9 @@ while True:
         set_buzzer(False)
 
     print("===== Pengukuran #%d [%s] =====" % (no, status_str))
-    print("Suhu DS18B20 : %.2f °C (Alarm jika >= %.1f)" % (suhu, TEMP_ALARM_THRESHOLD))
-    print("RMS Total    : %.3f m/s^2 (%.2f g) [Alarm jika >= %.2f g]" % (rms_total, rms_total / G, RMS_ALARM_THRESHOLD / G))
-    print("Peak Total   : %.3f m/s^2 (%.2f g)" % (peak_total, peak_total / G))
+    print("Suhu DS18B20 : %.2f °C (Alarm jika > %.1f °C)" % (suhu, TEMP_ALARM_THRESHOLD))
+    print("RMS Total    : %.3f m/s^2 (%.2f g) [Alarm jika > %.1f m/s^2]" % (rms_total, rms_total / G, RMS_ALARM_THRESHOLD))
+    print("Peak Total   : %.3f m/s^2 (%.2f g) [Alarm jika > %.1f m/s^2]" % (peak_total, peak_total / G, PEAK_ALARM_THRESHOLD))
     print("Freq Dominan : %.2f Hz | Amp Dominan: %.3f m/s^2" % (r[8], r[9]))
 
     # Payload Lengkap (Kompatibel dengan semua widget ThingsBoard)

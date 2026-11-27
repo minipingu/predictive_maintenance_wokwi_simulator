@@ -57,7 +57,7 @@
   "connections": [
     [
       "temp1:DQ",
-      "pico:GP16",
+      "pico:GP4",
       "gold",
       [
         "v0"
@@ -74,7 +74,7 @@
     ],
     [
       "mpu1:SDA",
-      "pico:GP20",
+      "pico:GP2",
       "blue",
       [
         "h-19.2",
@@ -83,7 +83,7 @@
     ],
     [
       "mpu1:SCL",
-      "pico:GP21",
+      "pico:GP3",
       "gold",
       [
         "h-28.8",
@@ -101,7 +101,7 @@
     ],
     [
       "lcd1:SDA",
-      "pico:GP20",
+      "pico:GP2",
       "blue",
       [
         "h-28.8",
@@ -110,7 +110,7 @@
     ],
     [
       "lcd1:SCL",
-      "pico:GP21",
+      "pico:GP3",
       "gold",
       [
         "h-19.2",
@@ -173,7 +173,7 @@
     ],
     [
       "bz1:2",
-      "pico:GP28",
+      "pico:GP17",
       "red",
       [
         "v0"
