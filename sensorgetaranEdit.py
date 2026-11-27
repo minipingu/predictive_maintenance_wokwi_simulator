@@ -10,6 +10,7 @@ import paho.mqtt.client as mqtt
 import json
 import RPi.GPIO as GPIO
 import os
+from collections import deque
 from typing import Optional, Tuple
 
 
@@ -411,28 +412,39 @@ def init_oled(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Optio
         return None
 
 
-def _fmt_val5(val: float) -> str:
-    """Format nilai float menjadi tepat 5 karakter agar muat rapi pada kolom OLED 21x8."""
-    if val < 0:
-        if val > -10.0:
-            return "{:5.2f}".format(val)
-        if val > -100.0:
-            return "{:5.1f}".format(val)
-        return "{:5.0f}".format(max(val, -999.0))
-    if val < 100.0:
-        return "{:5.2f}".format(val)
-    if val < 1000.0:
-        return "{:5.1f}".format(val)
-    return "{:5.0f}".format(min(val, 99999.0))
+# Jendela waktu (detik) untuk rata-rata Frekuensi Dominan Total (selaras dengan widget Avg ThingsBoard ~5 menit)
+FREQ_AVG_WINDOW_SECONDS: float = 300.0
+
+
+def _fmt_val4(val: float) -> str:
+    """Format nilai magnitudo (RMS/Peak per sumbu) ke tepat 4 karakter."""
+    val = abs(val)
+    if val < 9.995:
+        return "{:4.2f}".format(val)
+    if val < 99.95:
+        return "{:4.1f}".format(val)
+    return "{:4.0f}".format(min(val, 9999.0))
 
 
 def _fmt_val6(val: float, decimals_small: int = 2) -> str:
-    """Format nilai float menjadi 6 karakter untuk baris frekuensi dan amplitudo dominan."""
-    if -10.0 < val < 100.0:
-        return ("{:6." + str(decimals_small) + "f}").format(val)
-    if -100.0 < val < 1000.0:
+    """Format nilai float menjadi tepat 6 karakter untuk baris tunggal OLED."""
+    if decimals_small >= 3 and -9.99 < val < 99.999:
+        return "{:6.3f}".format(val)
+    if -99.99 < val < 999.99:
         return "{:6.2f}".format(val)
     return "{:6.1f}".format(max(min(val, 9999.9), -999.9))
+
+
+def _format_alert_row(alert_status: bool, alert_message: str) -> str:
+    """Format baris status alarm sesuai widget Status Alarm dashboard ThingsBoard."""
+    clean_msg = (alert_message or ("ALERT!" if alert_status else "NORMAL")).strip()
+    if not alert_status:
+        return "Status : {}".format(clean_msg)[:OLED_COLS]
+    if "GETARAN" in clean_msg and "SUHU" in clean_msg:
+        return "GETARAN+SUHU TINGGI!"
+    if len(clean_msg) <= 12:
+        return "Status : {}".format(clean_msg)
+    return clean_msg[:OLED_COLS]
 
 
 def format_oled_lines(
@@ -445,26 +457,23 @@ def format_oled_lines(
     peak_y: float,
     peak_z: float,
     peak_total: float,
-    frekuensi_dominan_total: float,
+    frekuensi_dominan_avg: float,
     amplitudo_dominan_total: float,
     alert_status: bool = False,
     alert_message: str = "",
 ) -> Tuple[str, ...]:
-    """Format seluruh parameter ThingsBoard ke dalam 8 baris (maks 21 karakter) untuk OLED SH1106."""
-    status_txt = "ALERT!" if alert_status else "NORMAL"
+    """Format 8 panel parameter dashboard ThingsBoard menjadi 8 baris OLED SH1106 (maks 21 char/baris)."""
+    row0 = "RX:{} Y:{} Z:{}".format(_fmt_val4(rms_x), _fmt_val4(rms_y), _fmt_val4(rms_z))
+    row1 = "RMS Tot:{} m/s2".format(_fmt_val6(rms_total, decimals_small=2))
+    row2 = "PX:{} Y:{} Z:{}".format(_fmt_val4(peak_x), _fmt_val4(peak_y), _fmt_val4(peak_z))
+    row3 = "PeakTot:{} m/s2".format(_fmt_val6(peak_total, decimals_small=2))
+    row4 = "FreqAvg:{} Hz".format(_fmt_val6(frekuensi_dominan_avg, decimals_small=2))
+    row5 = "Amp Dom:{} m/s2".format(_fmt_val6(amplitudo_dominan_total, decimals_small=3))
     if suhu is not None:
-        row0 = "{}  T:{:6.2f}\u00b0C".format(status_txt, suhu)
+        row6 = "Temp   :{}\u00b0C".format(_fmt_val6(suhu, decimals_small=2))
     else:
-        row0 = "{}  T: Error".format(status_txt)
-
-    clean_msg = (alert_message or "-").strip()
-    row1 = clean_msg
-    row2 = "RMS T:{} X:{}".format(_fmt_val5(rms_total), _fmt_val5(rms_x))
-    row3 = "RMS Y:{} Z:{}".format(_fmt_val5(rms_y), _fmt_val5(rms_z))
-    row4 = "PK  T:{} X:{}".format(_fmt_val5(peak_total), _fmt_val5(peak_x))
-    row5 = "PK  Y:{} Z:{}".format(_fmt_val5(peak_y), _fmt_val5(peak_z))
-    row6 = "Freq Dom:{} Hz".format(_fmt_val6(frekuensi_dominan_total, decimals_small=2))
-    row7 = "Amp  Dom:{} m/s2".format(_fmt_val6(amplitudo_dominan_total, decimals_small=3))
+        row6 = "Temp   : Error"
+    row7 = _format_alert_row(alert_status, alert_message)
 
     return tuple(row[:OLED_COLS] for row in (row0, row1, row2, row3, row4, row5, row6, row7))
 
@@ -629,6 +638,8 @@ print("Tekan CTRL+C untuk berhenti")
 # PROGRAM UTAMA
 # =====================================
 
+freq_history = deque()
+
 try:
 
     while True:
@@ -749,6 +760,13 @@ try:
             indeks_dominan
         ]
 
+        # Hitung rata-rata bergulir frekuensi dominan (jendela 5 menit seperti widget Avg ThingsBoard)
+        waktu_freq = time.monotonic()
+        freq_history.append((waktu_freq, float(frekuensi_dominan_total)))
+        while freq_history and (waktu_freq - freq_history[0][0]) > FREQ_AVG_WINDOW_SECONDS:
+            freq_history.popleft()
+        frekuensi_dominan_avg = sum(val for _, val in freq_history) / len(freq_history)
+
         # =====================================
         # PREDICTIVE MAINTENANCE ALERT
         # =====================================
@@ -840,6 +858,13 @@ try:
         )
 
         print(
+            "Frekuensi Dominan Avg   : {:.2f} Hz ({} sampel)".format(
+                frekuensi_dominan_avg,
+                len(freq_history),
+            )
+        )
+
+        print(
             "Amplitudo Dominan Total : {:.3f} m/s^2".format(
                 amplitudo_dominan_total
             )
@@ -864,7 +889,7 @@ try:
                     peak_y=peak_y,
                     peak_z=peak_z,
                     peak_total=peak_total,
-                    frekuensi_dominan_total=frekuensi_dominan_total,
+                    frekuensi_dominan_avg=frekuensi_dominan_avg,
                     amplitudo_dominan_total=amplitudo_dominan_total,
                     alert_status=alert_status,
                     alert_message=alert_message,
