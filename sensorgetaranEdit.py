@@ -140,124 +140,235 @@ def kirim_mqtt(topic, data):
 
 
 # =====================================
-# KONFIGURASI DAN DRIVER LCD I2C 16x2
+# KONFIGURASI DAN DRIVER OLED SH1106 128x64
 # =====================================
 
-# Isi None untuk deteksi otomatis (0x27 / 0x3F), atau isi eksplisit misal 0x27
-LCD_I2C_ADDR: Optional[int] = None
-LCD_CANDIDATE_ADDRS: Tuple[int, ...] = (
-    0x27, 0x3F, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20,
-    0x3E, 0x3D, 0x3C, 0x3B, 0x3A, 0x39, 0x38,
-)
-LCD_COLS: int = 16
-LCD_ROWS: int = 2
+# Isi None untuk deteksi otomatis (0x3C / 0x3D), atau isi eksplisit misal 0x3C
+OLED_I2C_ADDR: Optional[int] = None
+OLED_CANDIDATE_ADDRS: Tuple[int, ...] = (0x3C, 0x3D)
+OLED_WIDTH: int = 128
+OLED_HEIGHT: int = 64
+OLED_PAGES: int = 8
+OLED_COL_OFFSET: int = 2
+OLED_COLS: int = 21
+OLED_ROWS: int = 8
+
+# Font bitmap 5x7 kolom-per-byte (LSB di atas) untuk tampilan teks 21x8 pada SH1106
+_FONT_5X7 = {
+    " ": (0x00, 0x00, 0x00, 0x00, 0x00),
+    "!": (0x00, 0x00, 0x5F, 0x00, 0x00),
+    "%": (0x23, 0x13, 0x08, 0x64, 0x62),
+    "&": (0x36, 0x49, 0x55, 0x22, 0x50),
+    "(": (0x00, 0x1C, 0x22, 0x41, 0x00),
+    ")": (0x00, 0x41, 0x22, 0x1C, 0x00),
+    "*": (0x14, 0x08, 0x3E, 0x08, 0x14),
+    "+": (0x08, 0x08, 0x3E, 0x08, 0x08),
+    ",": (0x00, 0x50, 0x30, 0x00, 0x00),
+    "-": (0x08, 0x08, 0x08, 0x08, 0x08),
+    ".": (0x00, 0x60, 0x60, 0x00, 0x00),
+    "/": (0x20, 0x10, 0x08, 0x04, 0x02),
+    "0": (0x3E, 0x51, 0x49, 0x45, 0x3E),
+    "1": (0x00, 0x42, 0x7F, 0x40, 0x00),
+    "2": (0x42, 0x61, 0x51, 0x49, 0x46),
+    "3": (0x21, 0x41, 0x45, 0x4B, 0x31),
+    "4": (0x18, 0x14, 0x12, 0x7F, 0x10),
+    "5": (0x27, 0x45, 0x45, 0x45, 0x39),
+    "6": (0x3C, 0x4A, 0x49, 0x49, 0x30),
+    "7": (0x01, 0x71, 0x09, 0x05, 0x03),
+    "8": (0x36, 0x49, 0x49, 0x49, 0x36),
+    "9": (0x06, 0x49, 0x49, 0x29, 0x1E),
+    ":": (0x00, 0x36, 0x36, 0x00, 0x00),
+    ";": (0x00, 0x56, 0x36, 0x00, 0x00),
+    "<": (0x08, 0x14, 0x22, 0x41, 0x00),
+    "=": (0x14, 0x14, 0x14, 0x14, 0x14),
+    ">": (0x00, 0x41, 0x22, 0x14, 0x08),
+    "?": (0x02, 0x01, 0x51, 0x09, 0x06),
+    "A": (0x7E, 0x11, 0x11, 0x11, 0x7E),
+    "B": (0x7F, 0x49, 0x49, 0x49, 0x36),
+    "C": (0x3E, 0x41, 0x41, 0x41, 0x22),
+    "D": (0x7F, 0x41, 0x41, 0x22, 0x1C),
+    "E": (0x7F, 0x49, 0x49, 0x49, 0x41),
+    "F": (0x7F, 0x09, 0x09, 0x09, 0x01),
+    "G": (0x3E, 0x41, 0x49, 0x49, 0x7A),
+    "H": (0x7F, 0x08, 0x08, 0x08, 0x7F),
+    "I": (0x00, 0x41, 0x7F, 0x41, 0x00),
+    "J": (0x20, 0x40, 0x41, 0x3F, 0x01),
+    "K": (0x7F, 0x08, 0x14, 0x22, 0x41),
+    "L": (0x7F, 0x40, 0x40, 0x40, 0x40),
+    "M": (0x7F, 0x02, 0x0C, 0x02, 0x7F),
+    "N": (0x7F, 0x04, 0x08, 0x10, 0x7F),
+    "O": (0x3E, 0x41, 0x41, 0x41, 0x3E),
+    "P": (0x7F, 0x09, 0x09, 0x09, 0x06),
+    "Q": (0x3E, 0x41, 0x51, 0x21, 0x5E),
+    "R": (0x7F, 0x09, 0x19, 0x29, 0x46),
+    "S": (0x46, 0x49, 0x49, 0x49, 0x31),
+    "T": (0x01, 0x01, 0x7F, 0x01, 0x01),
+    "U": (0x3F, 0x40, 0x40, 0x40, 0x3F),
+    "V": (0x1F, 0x20, 0x40, 0x20, 0x1F),
+    "W": (0x3F, 0x40, 0x38, 0x40, 0x3F),
+    "X": (0x63, 0x14, 0x08, 0x14, 0x63),
+    "Y": (0x07, 0x08, 0x70, 0x08, 0x07),
+    "Z": (0x61, 0x51, 0x49, 0x45, 0x43),
+    "[": (0x00, 0x7F, 0x41, 0x41, 0x00),
+    "]": (0x00, 0x41, 0x41, 0x7F, 0x00),
+    "^": (0x04, 0x02, 0x01, 0x02, 0x04),
+    "_": (0x40, 0x40, 0x40, 0x40, 0x40),
+    "a": (0x20, 0x54, 0x54, 0x54, 0x78),
+    "b": (0x7F, 0x48, 0x44, 0x44, 0x38),
+    "c": (0x38, 0x44, 0x44, 0x44, 0x20),
+    "d": (0x38, 0x44, 0x44, 0x48, 0x7F),
+    "e": (0x38, 0x54, 0x54, 0x54, 0x18),
+    "f": (0x08, 0x7E, 0x09, 0x01, 0x02),
+    "g": (0x0C, 0x52, 0x52, 0x52, 0x3E),
+    "h": (0x7F, 0x08, 0x04, 0x04, 0x78),
+    "i": (0x00, 0x44, 0x7D, 0x40, 0x00),
+    "j": (0x20, 0x40, 0x44, 0x3D, 0x00),
+    "k": (0x7F, 0x10, 0x28, 0x44, 0x00),
+    "l": (0x00, 0x41, 0x7F, 0x40, 0x00),
+    "m": (0x7C, 0x04, 0x18, 0x04, 0x78),
+    "n": (0x7C, 0x08, 0x04, 0x04, 0x78),
+    "o": (0x38, 0x44, 0x44, 0x44, 0x38),
+    "p": (0x7C, 0x14, 0x14, 0x14, 0x08),
+    "q": (0x08, 0x14, 0x14, 0x18, 0x7C),
+    "r": (0x7C, 0x08, 0x04, 0x04, 0x08),
+    "s": (0x48, 0x54, 0x54, 0x54, 0x20),
+    "t": (0x04, 0x3F, 0x44, 0x40, 0x20),
+    "u": (0x3C, 0x40, 0x40, 0x20, 0x7C),
+    "v": (0x1C, 0x20, 0x40, 0x20, 0x1C),
+    "w": (0x3C, 0x40, 0x30, 0x40, 0x3C),
+    "x": (0x44, 0x28, 0x10, 0x28, 0x44),
+    "y": (0x0C, 0x50, 0x50, 0x50, 0x3C),
+    "z": (0x44, 0x64, 0x54, 0x4C, 0x44),
+    "|": (0x00, 0x00, 0x7F, 0x00, 0x00),
+    "\u00b0": (0x06, 0x09, 0x09, 0x06, 0x00),
+}
 
 
-class I2CLcd16x2:
-    """Driver LCD karakter 16x2 berbasis PCF8574 menggunakan busio.I2C."""
+class SH1106Oled128x64:
+    """Driver OLED SH1106 128x64 berbasis I2C menggunakan busio.I2C tanpa dependensi eksternal."""
 
-    _RS: int = 0x01
-    _EN: int = 0x04
-    _BACKLIGHT: int = 0x08
-    _ROW_OFFSETS: Tuple[int, int] = (0x80, 0xC0)
+    _CTRL_CMD: int = 0x00
+    _CTRL_DATA: int = 0x40
+    _CMD_NOP: int = 0xE3
+    _DATA_CHUNK: int = 32
 
     def __init__(self, i2c_bus: busio.I2C, address: int) -> None:
         self._i2c: busio.I2C = i2c_bus
         self.address: int = address
         self._addr: int = address
-        self._backlight: int = self._BACKLIGHT
-        self._last_rows: Optional[Tuple[str, str]] = None
+        self._col_offset: int = OLED_COL_OFFSET
+        self._last_pages: Optional[Tuple[bytes, ...]] = None
         self._init_display()
 
-    def is_connected(self) -> bool:
-        """Periksa apakah modul PCF8574 masih merespons ACK pada bus I2C."""
+    def _acquire_bus(self) -> None:
+        deadline: float = time.monotonic() + 1.0
+        while not self._i2c.try_lock():
+            if time.monotonic() >= deadline:
+                raise RuntimeError("Timeout mengambil kunci bus I2C untuk OLED SH1106.")
+            time.sleep(0.001)
+
+    def _write_cmds_locked(self, cmds: Tuple[int, ...]) -> None:
+        for cmd in cmds:
+            self._i2c.writeto(self._addr, bytes((self._CTRL_CMD, cmd)))
+
+    def _write_page_locked(self, page: int, data: bytes) -> None:
+        low_col: int = self._col_offset & 0x0F
+        high_col: int = (self._col_offset >> 4) & 0x0F
+        self._write_cmds_locked((0xB0 | (page & 0x07), 0x00 | low_col, 0x10 | high_col))
+        for offset in range(0, OLED_WIDTH, self._DATA_CHUNK):
+            chunk = data[offset:offset + self._DATA_CHUNK]
+            self._i2c.writeto(self._addr, bytes((self._CTRL_DATA,)) + chunk)
+
+    def _render_line_to_page(self, text: str) -> bytes:
+        buf = bytearray(OLED_WIDTH)
+        pos = 0
+        for ch in text[:OLED_COLS]:
+            glyph = _FONT_5X7.get(ch, _FONT_5X7["?"])
+            buf[pos:pos + 5] = glyph
+            pos += 6
+        return bytes(buf)
+
+    def _init_display(self) -> None:
+        init_cmds: Tuple[int, ...] = (
+            0xAE,        # Display OFF
+            0xD5, 0x80,  # Set display clock divide ratio/oscillator freq
+            0xA8, 0x3F,  # Set multiplex ratio (1..64)
+            0xD3, 0x00,  # Display offset = 0
+            0x40,        # Display start line = 0
+            0xAD, 0x8B,  # Internal DC-DC enable (SH1106)
+            0xA1,        # Segment re-map (col 127 -> SEG0)
+            0xC8,        # COM scan direction remapped
+            0xDA, 0x12,  # COM pins hardware configuration
+            0x81, 0xCF,  # Contrast control
+            0xD9, 0x22,  # Pre-charge period
+            0xDB, 0x35,  # VCOMH deselect level
+            0xA4,        # Display follows GDDRAM
+            0xA6,        # Normal (non-inverted) display
+        )
+        blank_page = bytes(OLED_WIDTH)
         self._acquire_bus()
         try:
-            self._i2c.writeto(self._addr, bytes([self._backlight]))
+            self._write_cmds_locked(init_cmds)
+            for page in range(OLED_PAGES):
+                self._write_page_locked(page, blank_page)
+            self._write_cmds_locked((0xAF,))  # Display ON
+            self._last_pages = None
+        finally:
+            self._i2c.unlock()
+
+    def is_connected(self) -> bool:
+        """Periksa apakah panel SH1106 masih merespons ACK pada bus I2C."""
+        self._acquire_bus()
+        try:
+            self._i2c.writeto(self._addr, bytes((self._CTRL_CMD, self._CMD_NOP)))
             return True
         except OSError:
             return False
         finally:
             self._i2c.unlock()
 
-    def _acquire_bus(self) -> None:
-        deadline: float = time.monotonic() + 1.0
-        while not self._i2c.try_lock():
-            if time.monotonic() >= deadline:
-                raise RuntimeError("Timeout mengambil kunci bus I2C untuk LCD.")
-            time.sleep(0.001)
-
-    def _write_nibble_locked(self, nibble_and_mode: int) -> None:
-        data: int = nibble_and_mode | self._backlight
-        self._i2c.writeto(self._addr, bytes([data]))
-        self._i2c.writeto(self._addr, bytes([data | self._EN]))
-        time.sleep(0.0002)
-        self._i2c.writeto(self._addr, bytes([data]))
-        time.sleep(0.0001)
-
-    def _write_byte_locked(self, value: int, mode: int = 0) -> None:
-        high_nibble: int = (value & 0xF0) | mode
-        low_nibble: int = ((value << 4) & 0xF0) | mode
-        self._write_nibble_locked(high_nibble)
-        self._write_nibble_locked(low_nibble)
-
-    def _init_display(self) -> None:
-        time.sleep(0.05)
-        self._acquire_bus()
-        try:
-            for delay in (0.005, 0.005, 0.001):
-                self._write_nibble_locked(0x30)
-                time.sleep(delay)
-            self._write_nibble_locked(0x20)
-            time.sleep(0.001)
-
-            for cmd in (0x28, 0x08, 0x01, 0x06, 0x0C):
-                self._write_byte_locked(cmd, mode=0)
-                if cmd == 0x01:
-                    time.sleep(0.003)
-        finally:
-            self._i2c.unlock()
-
     def clear(self) -> None:
-        """Hapus seluruh karakter pada layar LCD."""
+        """Hapus seluruh piksel GDDRAM pada layar OLED SH1106."""
+        blank_page = bytes(OLED_WIDTH)
         self._acquire_bus()
         try:
-            self._write_byte_locked(0x01, mode=0)
-            time.sleep(0.002)
-            self._last_rows = None
+            for page in range(OLED_PAGES):
+                self._write_page_locked(page, blank_page)
+            self._last_pages = None
         finally:
             self._i2c.unlock()
 
-    def set_backlight(self, enabled: bool) -> None:
-        """Nyalakan atau matikan lampu latar LCD."""
-        self._backlight = self._BACKLIGHT if enabled else 0x00
+    def set_power(self, enabled: bool) -> None:
+        """Nyalakan (0xAF) atau matikan (0xAE) panel OLED SH1106."""
+        cmd = 0xAF if enabled else 0xAE
         self._acquire_bus()
         try:
-            self._i2c.writeto(self._addr, bytes([self._backlight]))
+            self._write_cmds_locked((cmd,))
         finally:
             self._i2c.unlock()
 
-    def display_lines(self, line1: str, line2: str, force: bool = False) -> None:
-        """Tampilkan 2 baris teks (16 karakter per baris) tanpa flicker dan skip I2C jika teks sama."""
-        rows: Tuple[str, str] = (
-            line1[:LCD_COLS].ljust(LCD_COLS),
-            line2[:LCD_COLS].ljust(LCD_COLS),
-        )
-        if not force and rows == self._last_rows:
+    def display_lines(self, lines: Tuple[str, ...], force: bool = False) -> None:
+        """Render hingga 8 baris teks (21 karakter/baris) ke SH1106 dan hanya kirim page yang berubah."""
+        normalized = [
+            (lines[i] if i < len(lines) else "")[:OLED_COLS].ljust(OLED_COLS)
+            for i in range(OLED_ROWS)
+        ]
+        rendered = tuple(self._render_line_to_page(row) for row in normalized)
+        if not force and rendered == self._last_pages:
             return
+
         self._acquire_bus()
         try:
-            for row_idx, text in enumerate(rows):
-                self._write_byte_locked(self._ROW_OFFSETS[row_idx], mode=0)
-                for ch in text:
-                    self._write_byte_locked(ord(ch), mode=self._RS)
-            self._last_rows = rows
+            for page, page_data in enumerate(rendered):
+                if force or self._last_pages is None or page_data != self._last_pages[page]:
+                    self._write_page_locked(page, page_data)
+            self._last_pages = rendered
         finally:
             self._i2c.unlock()
 
 
-def init_lcd(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Optional[I2CLcd16x2]:
-    """Deteksi alamat LCD I2C, cek koneksi, dan kembalikan instance I2CLcd16x2 jika tersedia."""
+def init_oled(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Optional[SH1106Oled128x64]:
+    """Deteksi alamat OLED SH1106 I2C, cek koneksi, dan kembalikan instance SH1106Oled128x64 jika tersedia."""
     while not i2c_bus.try_lock():
         time.sleep(0.001)
     try:
@@ -272,66 +383,97 @@ def init_lcd(i2c_bus: busio.I2C, preferred_addr: Optional[int] = None) -> Option
         if preferred_addr in found:
             target_addr = preferred_addr
     else:
-        for candidate in LCD_CANDIDATE_ADDRS:
+        for candidate in OLED_CANDIDATE_ADDRS:
             if candidate in found:
                 target_addr = candidate
                 break
 
     if target_addr is None:
         print(
-            "Status LCD I2C : TIDAK TERHUBUNG (alamat {} tidak ditemukan di bus I2C)".format(
-                [hex(a) for a in LCD_CANDIDATE_ADDRS[:2]]
+            "Status OLED SH1106 : TIDAK TERHUBUNG (alamat {} tidak ditemukan di bus I2C)".format(
+                [hex(a) for a in OLED_CANDIDATE_ADDRS]
             )
         )
         return None
 
     try:
-        lcd_device: I2CLcd16x2 = I2CLcd16x2(i2c_bus, target_addr)
-        terhubung: bool = lcd_device.is_connected()
+        oled_device: SH1106Oled128x64 = SH1106Oled128x64(i2c_bus, target_addr)
+        terhubung: bool = oled_device.is_connected()
         print(
-            "Status LCD I2C : {} (alamat {})".format(
+            "Status OLED SH1106 : {} (alamat {})".format(
                 "TERHUBUNG" if terhubung else "TIDAK MERESPONS",
                 hex(target_addr),
             )
         )
-        return lcd_device if terhubung else None
+        return oled_device if terhubung else None
     except Exception as exc:
-        print("Status LCD I2C : GAGAL INISIALISASI ({}) - {}".format(hex(target_addr), exc))
+        print("Status OLED SH1106 : GAGAL INISIALISASI ({}) - {}".format(hex(target_addr), exc))
         return None
 
 
-def _fmt_4char(val: float) -> str:
-    """Format angka positif ke tepat 4 karakter agar muat di kolom LCD 16x2."""
-    val = abs(val)
-    if val < 10.0:
-        return "{:4.2f}".format(val)
+def _fmt_val5(val: float) -> str:
+    """Format nilai float menjadi tepat 5 karakter agar muat rapi pada kolom OLED 21x8."""
+    if val < 0:
+        if val > -10.0:
+            return "{:5.2f}".format(val)
+        if val > -100.0:
+            return "{:5.1f}".format(val)
+        return "{:5.0f}".format(max(val, -999.0))
     if val < 100.0:
-        return "{:4.1f}".format(val)
-    return "{:4.0f}".format(min(val, 9999.0))
+        return "{:5.2f}".format(val)
+    if val < 1000.0:
+        return "{:5.1f}".format(val)
+    return "{:5.0f}".format(min(val, 99999.0))
 
 
-def format_lcd_lines(
+def _fmt_val6(val: float, decimals_small: int = 2) -> str:
+    """Format nilai float menjadi 6 karakter untuk baris frekuensi dan amplitudo dominan."""
+    if -10.0 < val < 100.0:
+        return ("{:6." + str(decimals_small) + "f}").format(val)
+    if -100.0 < val < 1000.0:
+        return "{:6.2f}".format(val)
+    return "{:6.1f}".format(max(min(val, 9999.9), -999.9))
+
+
+def format_oled_lines(
     suhu: Optional[float],
+    rms_x: float,
+    rms_y: float,
+    rms_z: float,
     rms_total: float,
+    peak_x: float,
+    peak_y: float,
+    peak_z: float,
     peak_total: float,
+    frekuensi_dominan_total: float,
+    amplitudo_dominan_total: float,
     alert_status: bool = False,
-) -> Tuple[str, str]:
-    """Format output Temp, RMS, dan Peak ke dalam 2 baris LCD 16x2."""
-    status_tag = "!!" if alert_status else "OK"
+    alert_message: str = "",
+) -> Tuple[str, ...]:
+    """Format seluruh parameter ThingsBoard ke dalam 8 baris (maks 21 karakter) untuk OLED SH1106."""
+    status_txt = "ALERT!" if alert_status else "NORMAL"
     if suhu is not None:
-        line1 = "Temp:{:6.2f} C {}".format(suhu, status_tag)
+        row0 = "{}  T:{:6.2f}\u00b0C".format(status_txt, suhu)
     else:
-        line1 = "Temp: Error   {}".format(status_tag)
+        row0 = "{}  T: Error".format(status_txt)
 
-    line2 = "RMS:{} PK:{}".format(_fmt_4char(rms_total), _fmt_4char(peak_total))
-    return line1[:LCD_COLS], line2[:LCD_COLS]
+    clean_msg = (alert_message or "-").strip()
+    row1 = clean_msg
+    row2 = "RMS T:{} X:{}".format(_fmt_val5(rms_total), _fmt_val5(rms_x))
+    row3 = "RMS Y:{} Z:{}".format(_fmt_val5(rms_y), _fmt_val5(rms_z))
+    row4 = "PK  T:{} X:{}".format(_fmt_val5(peak_total), _fmt_val5(peak_x))
+    row5 = "PK  Y:{} Z:{}".format(_fmt_val5(peak_y), _fmt_val5(peak_z))
+    row6 = "Freq Dom:{} Hz".format(_fmt_val6(frekuensi_dominan_total, decimals_small=2))
+    row7 = "Amp  Dom:{} m/s2".format(_fmt_val6(amplitudo_dominan_total, decimals_small=3))
+
+    return tuple(row[:OLED_COLS] for row in (row0, row1, row2, row3, row4, row5, row6, row7))
 
 
 # =====================================
 # INISIALISASI KOMUNIKASI I2C
 # =====================================
 
-lcd: Optional[I2CLcd16x2] = None
+oled: Optional[SH1106Oled128x64] = None
 
 try:
 
@@ -340,7 +482,7 @@ try:
         board.SDA
     )
 
-    lcd = init_lcd(i2c, LCD_I2C_ADDR)
+    oled = init_oled(i2c, OLED_I2C_ADDR)
 
     # =====================================
     # INISIALISASI SENSOR ADXL345
@@ -426,11 +568,16 @@ print("--------------------------------------")
 print("Memulai kalibrasi otomatis...")
 print("Pastikan sensor dalam keadaan diam!")
 
-if lcd is not None:
+if oled is not None:
     try:
-        lcd.display_lines("Kalibrasi ADXL..", "Jangan gerak...")
-    except Exception as lcd_err:
-        print("Gagal menulis ke LCD:", lcd_err)
+        oled.display_lines((
+            "PREDICTIVE MAINT.",
+            "Kalibrasi ADXL345...",
+            "Jangan gerakkan",
+            "sensor...",
+        ))
+    except Exception as oled_err:
+        print("Gagal menulis ke OLED SH1106:", oled_err)
 
 total_x = 0.0
 total_y = 0.0
@@ -703,19 +850,33 @@ try:
         print("Alert Status  :", alert_status)
         print("Alert Message :", alert_message)
 
-        print("\n--- LCD I2C 16x2 ---")
+        print("\n--- OLED SH1106 128x64 ---")
 
-        if lcd is not None:
+        if oled is not None:
             try:
-                baris1, baris2 = format_lcd_lines(suhu, rms_total, peak_total, alert_status)
-                lcd.display_lines(baris1, baris2)
-                print("Status LCD : TERHUBUNG ({})".format(hex(lcd.address)))
-                print("Baris 1    :", baris1)
-                print("Baris 2    :", baris2)
-            except Exception as lcd_err:
-                print("Status LCD : TERPUTUS / GAGAL ({}) - {}".format(hex(lcd.address), lcd_err))
+                oled_rows = format_oled_lines(
+                    suhu=suhu,
+                    rms_x=rms_x,
+                    rms_y=rms_y,
+                    rms_z=rms_z,
+                    rms_total=rms_total,
+                    peak_x=peak_x,
+                    peak_y=peak_y,
+                    peak_z=peak_z,
+                    peak_total=peak_total,
+                    frekuensi_dominan_total=frekuensi_dominan_total,
+                    amplitudo_dominan_total=amplitudo_dominan_total,
+                    alert_status=alert_status,
+                    alert_message=alert_message,
+                )
+                oled.display_lines(oled_rows)
+                print("Status OLED : TERHUBUNG ({})".format(hex(oled.address)))
+                for idx, baris in enumerate(oled_rows, start=1):
+                    print("Baris {}     : {}".format(idx, baris))
+            except Exception as oled_err:
+                print("Status OLED : TERPUTUS / GAGAL ({}) - {}".format(hex(oled.address), oled_err))
         else:
-            print("Status LCD : TIDAK TERHUBUNG (tidak terdeteksi saat inisialisasi)")
+            print("Status OLED : TIDAK TERHUBUNG (tidak terdeteksi saat inisialisasi)")
 
         # =====================================
         # PENGIRIMAN ATTRIBUTES THINGSBOARD
@@ -808,13 +969,13 @@ except Exception as e:
 finally:
 
     # =====================================
-    # PEMBERSIHAN LCD DAN GPIO
+    # PEMBERSIHAN OLED SH1106 DAN GPIO
     # =====================================
 
-    if lcd is not None:
+    if oled is not None:
         try:
-            lcd.clear()
-            lcd.set_backlight(False)
+            oled.clear()
+            oled.set_power(False)
         except Exception:
             pass
 
